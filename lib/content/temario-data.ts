@@ -60,7 +60,7 @@ Articulo 31.2: El registro electronico de cada Administracion u Organismo se reg
       "El celador realizara, entre otras, las siguientes funciones: tramitar o conducir sin tardanza las comunicaciones verbales, documentos, correspondencia u objetos que les sean confiados; trasladar y trasportar a los pacientes dentro del centro, tanto los servicios clinicos como complementarios; vigilar los accesos y la permanencia de los familiares y visitantes en las habitaciones; ayudar al personal sanitario en la movilizacion y traslado de los enfermos que precisen un trato especial. El celador NO podra en ningun caso administrar medicamentos ni realizar curas a los pacientes, funciones reservadas al personal sanitario.",
   },
   {
-    temaSlug: "constantes-vitales",
+    temaSlug: "tcae-rcp",
     titulo: "Valores normales de las constantes vitales",
     fuente: "Manual de tecnicas basicas de enfermeria, constantes vitales",
     contenido:
