@@ -16,7 +16,13 @@ async function main() {
       ? [existing]
       : await db
           .insert(categorias)
-          .values({ slug: cat.slug, nombre: cat.nombre, descripcion: cat.descripcion, orden: i })
+          .values({
+            slug: cat.slug,
+            nombre: cat.nombre,
+            descripcion: cat.descripcion,
+            orden: i,
+            activa: cat.activa ?? true,
+          })
           .returning();
 
     console.log(`  Categoria: ${categoria.nombre}`);

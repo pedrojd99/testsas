@@ -9,10 +9,13 @@ import {
   progresoPregunta,
   respuestas,
   sesiones,
+  temas,
 } from "@/lib/db";
 import { corregir } from "@/lib/scoring";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
+
+const COMUN_SLUG = "comun";
 
 type Modo = "tema" | "simulacro" | "falladas" | "rapido";
 
@@ -23,6 +26,16 @@ const LIMITES: Record<Modo, number> = {
   rapido: 10,
 };
 
+// IDs de temas de la categoria = especifico + comun (compartido)
+async function temaIdsDeCategoria(categoriaId: string): Promise<string[]> {
+  const comun = await db.query.categorias.findFirst({
+    where: eq(categorias.slug, COMUN_SLUG),
+  });
+  const ids = comun ? [categoriaId, comun.id] : [categoriaId];
+  const rows = await db.select({ id: temas.id }).from(temas).where(inArray(temas.categoriaId, ids));
+  return rows.map((r) => r.id);
+}
+
 async function seleccionarPreguntaIds(
   usuarioId: string,
   categoriaId: string,
@@ -30,17 +43,16 @@ async function seleccionarPreguntaIds(
   config: SesionConfig,
 ): Promise<string[]> {
   const limite = LIMITES[modo];
-  const base = and(eq(preguntas.categoriaId, categoriaId), eq(preguntas.activa, true));
 
-  if (modo === "tema" && config.temaIds?.length) {
-    const rows = await db
-      .select({ id: preguntas.id })
-      .from(preguntas)
-      .where(and(base, inArray(preguntas.temaId, config.temaIds)))
-      .orderBy(sql`random()`)
-      .limit(limite);
-    return rows.map((r) => r.id);
-  }
+  // En modo tema el usuario ya elige temas concretos (comun o especifico);
+  // en el resto, el pool es comun + especifico de la categoria.
+  const temaIds =
+    modo === "tema" && config.temaIds?.length
+      ? config.temaIds
+      : await temaIdsDeCategoria(categoriaId);
+  if (temaIds.length === 0) return [];
+
+  const base = and(inArray(preguntas.temaId, temaIds), eq(preguntas.activa, true));
 
   if (modo === "falladas") {
     const rows = await db
@@ -55,7 +67,6 @@ async function seleccionarPreguntaIds(
     return rows.map((r) => r.id);
   }
 
-  // simulacro y rapido: muestra aleatoria de toda la categoria
   const rows = await db
     .select({ id: preguntas.id })
     .from(preguntas)

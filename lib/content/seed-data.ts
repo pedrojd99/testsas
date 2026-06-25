@@ -2,7 +2,7 @@
 // La estructura de temas viene de la oficial (temas-oficiales.ts); aqui solo
 // se anaden algunas preguntas de muestra. El banco real se genera desde temario.
 
-import { type TemaOficial, temasDeCategoria } from "./temas-oficiales";
+import { ESPECIFICOS_POR_CATEGORIA, TEMAS_COMUNES, type TemaOficial } from "./temas-oficiales";
 
 export interface SeedPregunta {
   enunciado: string;
@@ -19,9 +19,14 @@ export interface SeedCategoria {
   slug: string;
   nombre: string;
   descripcion: string;
+  // Categoria estructural (comun): no se muestra como oposicion en el catalogo
+  activa?: boolean;
   temas: TemaOficial[];
   preguntas: SeedPregunta[];
 }
+
+// Slug de la categoria estructural que agrupa el temario comun una sola vez.
+export const COMUN_SLUG = "comun";
 
 // Preguntas de ejemplo del temario comun (validas para cualquier categoria)
 const PREGUNTAS_COMUNES: SeedPregunta[] = [
@@ -225,35 +230,45 @@ const PREGUNTAS_AUX_ADMIN: SeedPregunta[] = [
 
 export const SEED_CATEGORIAS: SeedCategoria[] = [
   {
+    // Categoria estructural: agrupa el temario comun una sola vez. Oculta del
+    // catalogo; sus temas y preguntas se inyectan en todas las categorias reales.
+    slug: COMUN_SLUG,
+    nombre: "Temario comun",
+    descripcion: "Parte comun compartida por todas las categorias del SAS.",
+    activa: false,
+    temas: TEMAS_COMUNES,
+    preguntas: PREGUNTAS_COMUNES,
+  },
+  {
     slug: "celador",
     nombre: "Celador/a",
     descripcion:
       "Categoria con gran numero de plazas y temario breve. Parte comun + funciones del celador.",
-    temas: temasDeCategoria("celador"),
-    preguntas: [...PREGUNTAS_COMUNES, ...PREGUNTAS_CELADOR],
+    temas: ESPECIFICOS_POR_CATEGORIA.celador,
+    preguntas: PREGUNTAS_CELADOR,
   },
   {
     slug: "tcae",
     nombre: "Tecnico/a en Cuidados Auxiliares de Enfermeria (TCAE)",
     descripcion:
       "Una de las categorias con mas plazas. Cuidados auxiliares, higiene y atencion al paciente.",
-    temas: temasDeCategoria("tcae"),
-    preguntas: [...PREGUNTAS_COMUNES, ...PREGUNTAS_TCAE],
+    temas: ESPECIFICOS_POR_CATEGORIA.tcae,
+    preguntas: PREGUNTAS_TCAE,
   },
   {
     slug: "enfermeria",
     nombre: "Enfermero/a",
     descripcion:
       "Temario amplio (~78 temas): parte comun + proceso enfermero, farmacologia y cuidados especializados.",
-    temas: temasDeCategoria("enfermeria"),
-    preguntas: [...PREGUNTAS_COMUNES, ...PREGUNTAS_ENFERMERIA],
+    temas: ESPECIFICOS_POR_CATEGORIA.enfermeria,
+    preguntas: PREGUNTAS_ENFERMERIA,
   },
   {
     slug: "aux-administrativo",
     nombre: "Auxiliar Administrativo",
     descripcion:
       "Temario transversal: parte comun + procedimiento administrativo, gestion e informatica.",
-    temas: temasDeCategoria("aux-administrativo"),
-    preguntas: [...PREGUNTAS_COMUNES, ...PREGUNTAS_AUX_ADMIN],
+    temas: ESPECIFICOS_POR_CATEGORIA["aux-administrativo"],
+    preguntas: PREGUNTAS_AUX_ADMIN,
   },
 ];

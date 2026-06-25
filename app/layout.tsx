@@ -30,6 +30,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </Link>
               {session ? (
                 <>
+                  {session.rol === "admin" && (
+                    <Link href="/admin" className="text-muted-foreground hover:text-foreground">
+                      Admin
+                    </Link>
+                  )}
                   <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
                     Mi panel
                   </Link>

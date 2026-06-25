@@ -1,6 +1,13 @@
 import "server-only";
 import { categorias, db, preguntas, progresoPregunta, respuestas, sesiones, temas } from "@/lib/db";
-import { and, count, eq, isNotNull, lte, sql } from "drizzle-orm";
+import { and, count, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
+
+// Slug de la categoria estructural que agrupa el temario comun una sola vez.
+export const COMUN_SLUG = "comun";
+
+export async function getComunCategoria() {
+  return db.query.categorias.findFirst({ where: eq(categorias.slug, COMUN_SLUG) });
+}
 
 export async function getCategorias() {
   const cats = await db.query.categorias.findMany({
@@ -8,15 +15,18 @@ export async function getCategorias() {
     orderBy: (c, { asc }) => asc(c.orden),
   });
 
-  // Conteo de preguntas activas por categoria
   const counts = await db
     .select({ categoriaId: preguntas.categoriaId, total: count() })
     .from(preguntas)
     .where(eq(preguntas.activa, true))
     .groupBy(preguntas.categoriaId);
-
   const countMap = new Map(counts.map((c) => [c.categoriaId, c.total]));
-  return cats.map((c) => ({ ...c, totalPreguntas: countMap.get(c.id) ?? 0 }));
+
+  // El comun se suma a todas las categorias reales (preguntas compartidas)
+  const comun = await getComunCategoria();
+  const comunCount = comun ? (countMap.get(comun.id) ?? 0) : 0;
+
+  return cats.map((c) => ({ ...c, totalPreguntas: (countMap.get(c.id) ?? 0) + comunCount }));
 }
 
 export async function getCategoriaPorSlug(slug: string) {
@@ -25,15 +35,19 @@ export async function getCategoriaPorSlug(slug: string) {
   });
   if (!categoria) return null;
 
+  const comun = await getComunCategoria();
+  const categoriaIds = comun ? [categoria.id, comun.id] : [categoria.id];
+
+  // Temas: comun (compartido) + especifico de la categoria
   const temasCat = await db.query.temas.findMany({
-    where: eq(temas.categoriaId, categoria.id),
+    where: inArray(temas.categoriaId, categoriaIds),
     orderBy: (t, { asc }) => [asc(t.bloque), asc(t.orden)],
   });
 
   const counts = await db
     .select({ temaId: preguntas.temaId, total: count() })
     .from(preguntas)
-    .where(and(eq(preguntas.categoriaId, categoria.id), eq(preguntas.activa, true)))
+    .where(and(inArray(preguntas.categoriaId, categoriaIds), eq(preguntas.activa, true)))
     .groupBy(preguntas.temaId);
   const countMap = new Map(counts.map((c) => [c.temaId, c.total]));
 
