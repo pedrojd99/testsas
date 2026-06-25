@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 150 30% 98%;
+    --foreground: 175 30% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 175 30% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 175 30% 11%;
+
+    /* Verde sanitario SAS */
+    --primary: 167 72% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 14% 96%;
+    --secondary-foreground: 175 30% 11%;
+
+    --muted: 160 14% 96%;
+    --muted-foreground: 175 9% 42%;
+
+    --accent: 160 30% 93%;
+    --accent-foreground: 175 30% 11%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 63% 38%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 160 16% 90%;
+    --input: 160 16% 90%;
+    --ring: 167 72% 30%;
+
+    --radius: 0.625rem;
+
+    --shadow-sm: 0 1px 3px 0 rgb(6 38 30 / 0.06), 0 1px 2px -1px rgb(6 38 30 / 0.04);
+    --shadow-md: 0 4px 8px -2px rgb(6 38 30 / 0.06), 0 2px 4px -2px rgb(6 38 30 / 0.04);
+    --shadow-lg: 0 12px 24px -8px rgb(6 38 30 / 0.1), 0 4px 8px -4px rgb(6 38 30 / 0.06);
+
+    --gradient-hero: radial-gradient(ellipse at top, hsl(167 72% 30% / 0.08) 0%, transparent 55%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 14% 99%) 100%);
+  }
+
+  .dark {
+    --background: 175 30% 6%;
+    --foreground: 160 14% 95%;
+
+    --card: 175 25% 9%;
+    --card-foreground: 160 14% 95%;
+
+    --popover: 175 25% 9%;
+    --popover-foreground: 160 14% 95%;
+
+    --primary: 162 64% 46%;
+    --primary-foreground: 175 30% 6%;
+
+    --secondary: 175 18% 15%;
+    --secondary-foreground: 160 14% 95%;
+
+    --muted: 175 18% 13%;
+    --muted-foreground: 160 9% 62%;
+
+    --accent: 175 18% 17%;
+    --accent-foreground: 160 14% 95%;
+
+    --destructive: 0 62% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 145 55% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 175 18% 17%;
+    --input: 175 18% 17%;
+    --ring: 162 64% 46%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight;
+  }
+  h1 {
+    letter-spacing: -0.025em;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.15);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .hero-radial {
+    background-image: var(--gradient-hero);
+  }
+  .card-elevated {
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-md);
+    @apply border;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20;
+  }
+  .eyebrow {
+    @apply text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+  }
+  .numeral {
+    @apply font-display text-4xl md:text-5xl leading-none text-primary/30 tabular-nums;
+  }
+  .bg-grid {
+    background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .bg-grid-fade {
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .shadow-soft {
+    box-shadow: var(--shadow-sm);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-md);
+  }
+  .shadow-floating {
+    box-shadow: var(--shadow-lg);
+  }
+}
