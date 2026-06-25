@@ -87,6 +87,28 @@ export const temas = pgTable(
   }),
 );
 
+// Fragmentos del temario que sirven de fuente para generar preguntas.
+// Cada chunk se asocia a un tema y lleva su cita legal/fuente.
+export const temario = pgTable(
+  "temario",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    temaId: uuid("tema_id")
+      .notNull()
+      .references(() => temas.id, { onDelete: "cascade" }),
+    titulo: text("titulo"),
+    contenido: text("contenido").notNull(),
+    fuente: text("fuente").notNull(),
+    orden: integer("orden").notNull().default(0),
+    // Cuantas preguntas se han generado ya desde este fragmento
+    preguntasGeneradas: integer("preguntas_generadas").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    temaIdx: index("temario_tema_idx").on(t.temaId),
+  }),
+);
+
 export const preguntas = pgTable(
   "preguntas",
   {
@@ -95,6 +117,8 @@ export const preguntas = pgTable(
       .notNull()
       .references(() => categorias.id, { onDelete: "cascade" }),
     temaId: uuid("tema_id").references(() => temas.id, { onDelete: "set null" }),
+    // Fragmento de temario del que se genero (trazabilidad)
+    temarioId: uuid("temario_id").references(() => temario.id, { onDelete: "set null" }),
     enunciado: text("enunciado").notNull(),
     // 4 opciones en orden; correctaIndex apunta a la correcta (0-3)
     opciones: jsonb("opciones").$type<string[]>().notNull(),
@@ -243,6 +267,15 @@ export const temasRelations = relations(temas, ({ one, many }) => ({
   categoria: one(categorias, {
     fields: [temas.categoriaId],
     references: [categorias.id],
+  }),
+  preguntas: many(preguntas),
+  temario: many(temario),
+}));
+
+export const temarioRelations = relations(temario, ({ one, many }) => ({
+  tema: one(temas, {
+    fields: [temario.temaId],
+    references: [temas.id],
   }),
   preguntas: many(preguntas),
 }));

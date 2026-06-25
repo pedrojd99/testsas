@@ -16,6 +16,6 @@
     "lineWidth": 100
   },
   "files": {
-    "ignore": [".next", "node_modules", "drizzle"]
+    "ignore": [".next", "node_modules", "drizzle", "next-env.d.ts"]
   }
 }
