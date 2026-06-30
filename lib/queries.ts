@@ -1,5 +1,14 @@
 import "server-only";
-import { categorias, db, preguntas, progresoPregunta, respuestas, sesiones, temas } from "@/lib/db";
+import {
+  apuntes,
+  categorias,
+  db,
+  preguntas,
+  progresoPregunta,
+  respuestas,
+  sesiones,
+  temas,
+} from "@/lib/db";
 import { and, count, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
 
 // Slug de la categoria estructural que agrupa el temario comun una sola vez.
@@ -103,6 +112,44 @@ export async function getSesionResultado(sesionId: string, usuarioId: string) {
     .orderBy(respuestas.createdAt);
 
   return { sesion, preguntas: filas };
+}
+
+// Indice del temario de una categoria (comun + especifico), en orden,
+// con marca de si cada tema ya tiene apuntes para estudiar/escuchar.
+export async function getTemarioIndice(categoriaSlug: string) {
+  const categoria = await db.query.categorias.findFirst({
+    where: eq(categorias.slug, categoriaSlug),
+  });
+  if (!categoria) return null;
+
+  const comun = await getComunCategoria();
+  const categoriaIds = comun ? [categoria.id, comun.id] : [categoria.id];
+
+  const filas = await db
+    .select({
+      id: temas.id,
+      nombre: temas.nombre,
+      bloque: temas.bloque,
+      orden: temas.orden,
+      tieneApuntes: sql<boolean>`${apuntes.id} is not null`,
+      palabras: apuntes.palabras,
+    })
+    .from(temas)
+    .leftJoin(apuntes, eq(apuntes.temaId, temas.id))
+    .where(inArray(temas.categoriaId, categoriaIds))
+    .orderBy(temas.bloque, temas.orden);
+
+  return { categoria, temas: filas };
+}
+
+export async function getApunteTema(temaId: string) {
+  const tema = await db.query.temas.findFirst({
+    where: eq(temas.id, temaId),
+    with: { categoria: { columns: { nombre: true, slug: true } } },
+  });
+  if (!tema) return null;
+  const apunte = await db.query.apuntes.findFirst({ where: eq(apuntes.temaId, temaId) });
+  return { tema, apunte };
 }
 
 export async function getDashboard(usuarioId: string) {

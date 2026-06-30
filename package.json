@@ -13,8 +13,10 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
     "db:seed-temario": "tsx --env-file=.env.local scripts/seed-temario.ts",
+    "db:seed-apuntes": "tsx --env-file=.env.local scripts/seed-apuntes.ts",
     "ingest": "tsx --env-file=.env.local scripts/ingestar.ts",
-    "gen": "tsx --env-file=.env.local scripts/generar.ts"
+    "gen": "tsx --env-file=.env.local scripts/generar.ts",
+    "gen-temario": "tsx --env-file=.env.local scripts/generar-temario.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

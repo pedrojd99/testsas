@@ -35,6 +35,15 @@ export default async function CategoriaDetallePage({
         {categoria.totalPreguntas} preguntas en el banco
       </p>
 
+      <div className="mt-4">
+        <a
+          href={`/categorias/${slug}/temario`}
+          className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm hover:bg-accent"
+        >
+          Estudiar el temario y escucharlo
+        </a>
+      </div>
+
       {!session && (
         <div className="mt-6 rounded-md border border-primary/30 bg-primary/5 p-4 text-sm">
           Necesitas una cuenta para hacer test.{" "}

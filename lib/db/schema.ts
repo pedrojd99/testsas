@@ -109,6 +109,29 @@ export const temario = pgTable(
   }),
 );
 
+// Apuntes didacticos por tema (texto de estudio para leer y escuchar).
+// Distinto de `temario` (fragmentos-fuente para generar preguntas).
+export const apuntes = pgTable(
+  "apuntes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    temaId: uuid("tema_id")
+      .notNull()
+      .references(() => temas.id, { onDelete: "cascade" }),
+    titulo: text("titulo").notNull(),
+    resumen: text("resumen"),
+    contenido: text("contenido").notNull(),
+    puntosClave: jsonb("puntos_clave").$type<string[]>(),
+    // URL de audio pregenerado (TTS); null = se reproduce con voz del navegador
+    audioUrl: text("audio_url"),
+    palabras: integer("palabras").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    temaIdx: uniqueIndex("apuntes_tema_idx").on(t.temaId),
+  }),
+);
+
 export const preguntas = pgTable(
   "preguntas",
   {
@@ -278,6 +301,13 @@ export const temarioRelations = relations(temario, ({ one, many }) => ({
     references: [temas.id],
   }),
   preguntas: many(preguntas),
+}));
+
+export const apuntesRelations = relations(apuntes, ({ one }) => ({
+  tema: one(temas, {
+    fields: [apuntes.temaId],
+    references: [temas.id],
+  }),
 }));
 
 export const preguntasRelations = relations(preguntas, ({ one }) => ({
