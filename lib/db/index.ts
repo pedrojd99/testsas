@@ -17,7 +17,10 @@ function getDb(): DB {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new Error("DATABASE_URL no esta definida");
 
-  const client = globalForDb.client ?? postgres(connectionString, { prepare: false });
+  // Serverless (Vercel + Neon pooler): pool minimo, sin prepared statements
+  // (pgbouncer en modo transaccion). En dev se cachea la conexion globalmente.
+  const client =
+    globalForDb.client ?? postgres(connectionString, { prepare: false, max: 1, idle_timeout: 20 });
   if (process.env.NODE_ENV !== "production") globalForDb.client = client;
 
   const instance = drizzle(client, { schema, casing: "snake_case" });
