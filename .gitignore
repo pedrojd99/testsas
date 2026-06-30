@@ -7,3 +7,12 @@ out
 *.log
 .DS_Store
 drizzle/meta
+
+# Android / Capacitor build artifacts
+android/app/build
+android/build
+android/.gradle
+android/local.properties
+android/app/release
+*.apk
+*.aab

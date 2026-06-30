@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>TestSAS</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0b6b5e; color: #fff;
+        font-family: -apple-system, system-ui, sans-serif; }
+      .wrap { height: 100%; display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 1rem; text-align: center; padding: 2rem; }
+      .cross { width: 64px; height: 64px; position: relative; }
+      .cross::before, .cross::after { content: ""; position: absolute; background: #fff; border-radius: 4px; }
+      .cross::before { left: 26px; top: 6px; width: 12px; height: 52px; }
+      .cross::after { top: 26px; left: 6px; width: 52px; height: 12px; }
+      h1 { font-size: 1.5rem; margin: 0; }
+      p { opacity: 0.85; max-width: 22rem; }
+      a { color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="cross"></div>
+      <h1>TestSAS</h1>
+      <p>
+        Esta pantalla solo se ve si no se ha configurado la URL de la app.
+        Define <code>CAP_SERVER_URL</code> con tu dominio desplegado y vuelve a
+        ejecutar <code>npx cap sync</code>.
+      </p>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,6 @@
+import { PwaRegister } from "@/components/pwa-register";
 import { getSession } from "@/lib/auth";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
@@ -10,7 +11,17 @@ const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader
 export const metadata: Metadata = {
   title: "TestSAS — Simulacros y test para las oposiciones del SAS",
   description:
-    "Miles de preguntas tipo test del Servicio Andaluz de Salud: celador, TCAE, enfermeria y auxiliar administrativo. Simulacros cronometrados, estadisticas y tutor IA.",
+    "Banco de preguntas del temario oficial del Servicio Andaluz de Salud: celador, TCAE, enfermeria y auxiliar administrativo. Simulacros cronometrados, estadisticas y tutor IA.",
+  applicationName: "TestSAS",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "TestSAS" },
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b6b5e",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -65,6 +76,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
           </div>
         </header>
+        <PwaRegister />
         <main className="min-h-[calc(100vh-4rem)]">{children}</main>
         <footer className="border-t py-8">
           <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
