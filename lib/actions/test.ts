@@ -12,18 +12,20 @@ import {
   temas,
 } from "@/lib/db";
 import { corregir } from "@/lib/scoring";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { calcularRepaso, proximaRevision } from "@/lib/spaced-repetition";
+import { and, eq, inArray, lte, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 const COMUN_SLUG = "comun";
 
-type Modo = "tema" | "simulacro" | "falladas" | "rapido";
+type Modo = "tema" | "simulacro" | "falladas" | "rapido" | "repaso";
 
 const LIMITES: Record<Modo, number> = {
   tema: 20,
   simulacro: 100,
   falladas: 30,
   rapido: 10,
+  repaso: 20,
 };
 
 // IDs de temas de la categoria = especifico + comun (compartido)
@@ -43,6 +45,25 @@ async function seleccionarPreguntaIds(
   config: SesionConfig,
 ): Promise<string[]> {
   const limite = LIMITES[modo];
+
+  // Repaso espaciado: preguntas vencidas del usuario (proximaRevision <= ahora),
+  // global a todas sus categorias, priorizando las mas atrasadas.
+  if (modo === "repaso") {
+    const rows = await db
+      .select({ id: preguntas.id })
+      .from(preguntas)
+      .innerJoin(progresoPregunta, eq(progresoPregunta.preguntaId, preguntas.id))
+      .where(
+        and(
+          eq(preguntas.activa, true),
+          eq(progresoPregunta.usuarioId, usuarioId),
+          lte(progresoPregunta.proximaRevision, sql`now()`),
+        ),
+      )
+      .orderBy(progresoPregunta.proximaRevision)
+      .limit(LIMITES.repaso);
+    return rows.map((r) => r.id);
+  }
 
   // En modo tema el usuario ya elige temas concretos (comun o especifico);
   // en el resto, el pool es comun + especifico de la categoria.
@@ -200,13 +221,8 @@ async function actualizarProgreso(
     ),
   });
 
-  // Calidad binaria simple: acierto=5, fallo=2 -> ajusta facilidad e intervalo
-  const facilidadPrev = existing?.facilidad ?? 2.5;
-  const facilidad = Math.max(1.3, facilidadPrev + (esCorrecta ? 0.1 : -0.2));
-  const intervaloPrev = existing?.intervaloDias ?? 0;
-  const intervalo = esCorrecta ? Math.max(1, Math.round((intervaloPrev || 1) * facilidad)) : 1;
-
-  const proxima = sql`now() + (${intervalo} * interval '1 day')`;
+  const { facilidad, intervaloDias } = calcularRepaso(existing ?? null, esCorrecta);
+  const proxima = proximaRevision(new Date(), intervaloDias);
 
   if (existing) {
     await db
@@ -215,7 +231,7 @@ async function actualizarProgreso(
         nAciertos: existing.nAciertos + (esCorrecta ? 1 : 0),
         nFallos: existing.nFallos + (esCorrecta ? 0 : 1),
         facilidad,
-        intervaloDias: intervalo,
+        intervaloDias,
         ultimaVista: sql`now()`,
         proximaRevision: proxima,
       })
@@ -227,7 +243,7 @@ async function actualizarProgreso(
       nAciertos: esCorrecta ? 1 : 0,
       nFallos: esCorrecta ? 0 : 1,
       facilidad,
-      intervaloDias: intervalo,
+      intervaloDias,
       ultimaVista: sql`now()`,
       proximaRevision: proxima,
     });

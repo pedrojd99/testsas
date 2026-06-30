@@ -21,7 +21,7 @@ export const rolEnum = pgEnum("rol", ["learner", "admin"]);
 export const planEnum = pgEnum("plan", ["free", "premium"]);
 export const bloqueEnum = pgEnum("bloque", ["comun", "especifica"]);
 export const dificultadEnum = pgEnum("dificultad", ["facil", "media", "dificil"]);
-export const modoEnum = pgEnum("modo", ["tema", "simulacro", "falladas", "rapido"]);
+export const modoEnum = pgEnum("modo", ["tema", "simulacro", "falladas", "rapido", "repaso"]);
 export const subStatusEnum = pgEnum("sub_status", [
   "active",
   "trialing",

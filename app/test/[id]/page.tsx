@@ -23,6 +23,7 @@ export default async function TestPage({ params }: { params: Promise<{ id: strin
       preguntas={data.preguntas}
       modo={data.sesion.modo}
       tiempoLimiteSeg={config.tiempoLimiteSeg}
+      startedAt={data.sesion.startedAt.toISOString()}
     />
   );
 }

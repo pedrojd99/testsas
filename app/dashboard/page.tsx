@@ -1,7 +1,8 @@
 import { salir } from "@/lib/actions/auth";
+import { iniciarSesion } from "@/lib/actions/test";
 import { getSession } from "@/lib/auth";
 import { getDashboard } from "@/lib/queries";
-import { RotateCcw, TrendingDown } from "lucide-react";
+import { Flame, RotateCcw, TrendingDown } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -11,10 +12,11 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { recientes, totales, porTema, repasoPendiente } = await getDashboard(session.uid);
+  const { recientes, totales, porTema, repasoPendiente, racha } = await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
     totalRespondidas > 0 ? Math.round((Number(totales.aciertos) / totalRespondidas) * 100) : 0;
+  const slugRepaso = recientes[0]?.categoria.slug;
 
   return (
     <div className="container py-12">
@@ -33,24 +35,43 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPIs */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Kpi label="Test completados" value={Number(totales.sesiones)} />
         <Kpi label="Precision global" value={`${precisionGlobal}%`} />
         <Kpi label="Aciertos" value={Number(totales.aciertos)} className="text-success" />
         <Kpi label="Fallos" value={Number(totales.fallos)} className="text-destructive" />
+        <div className="rounded-lg border bg-card p-5 shadow-soft">
+          <p className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-muted-foreground">
+            <Flame className="h-3.5 w-3.5 text-amber-500" /> Racha
+          </p>
+          <p className="mt-1 font-display text-3xl font-semibold">
+            {racha} <span className="text-base font-normal text-muted-foreground">dias</span>
+          </p>
+        </div>
       </div>
 
-      {/* Repaso pendiente */}
-      {repasoPendiente > 0 && (
-        <div className="mt-6 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-4">
+      {/* Repaso de hoy (espaciado) */}
+      {repasoPendiente > 0 && slugRepaso && (
+        <form
+          action={iniciarSesion}
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4"
+        >
+          <input type="hidden" name="categoriaSlug" value={slugRepaso} />
+          <input type="hidden" name="modo" value="repaso" />
           <div className="flex items-center gap-3">
             <RotateCcw className="h-5 w-5 text-primary" />
             <p className="text-sm">
-              Tienes <strong>{repasoPendiente}</strong> preguntas listas para repasar (repaso
+              Tienes <strong>{repasoPendiente}</strong> preguntas listas para repasar hoy (repaso
               espaciado).
             </p>
           </div>
-        </div>
+          <button
+            type="submit"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Repasar ahora
+          </button>
+        </form>
       )}
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">

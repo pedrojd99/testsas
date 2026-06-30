@@ -199,6 +199,8 @@ export async function getDashboard(usuarioId: string) {
       ),
     );
 
+  const racha = await getRacha(usuarioId);
+
   return {
     recientes,
     totales,
@@ -207,5 +209,29 @@ export async function getDashboard(usuarioId: string) {
       precision: t.total > 0 ? Math.round((Number(t.aciertos) / t.total) * 100) : 0,
     })),
     repasoPendiente: pendientes?.total ?? 0,
+    racha,
   };
+}
+
+// Racha de dias consecutivos con al menos un test completado.
+export async function getRacha(usuarioId: string): Promise<number> {
+  const rows = await db
+    .select({ dia: sql<string>`(${sesiones.finishedAt} at time zone 'UTC')::date::text` })
+    .from(sesiones)
+    .where(and(eq(sesiones.usuarioId, usuarioId), isNotNull(sesiones.finishedAt)))
+    .groupBy(sql`(${sesiones.finishedAt} at time zone 'UTC')::date`);
+
+  const dias = new Set(rows.map((r) => r.dia));
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+  const cursor = new Date();
+  // Si hoy aun no hay actividad, la racha puede venir desde ayer.
+  if (!dias.has(fmt(cursor))) cursor.setUTCDate(cursor.getUTCDate() - 1);
+
+  let racha = 0;
+  while (dias.has(fmt(cursor))) {
+    racha++;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+  return racha;
 }
