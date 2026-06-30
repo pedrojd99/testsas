@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dedupLote, esDuplicado, similitud } from "./dedup";
+import { cosineSim, dedupLote, esDuplicado, esDuplicadoSemantico, similitud } from "./dedup";
 
 describe("similitud lexica", () => {
   it("identicas = 1", () => {
@@ -44,5 +44,24 @@ describe("esDuplicado / dedupLote", () => {
     // Solo queda una de las de frecuencia respiratoria
     expect(out.length).toBe(1);
     expect(out[0].enunciado).toContain("frecuencia respiratoria");
+  });
+});
+
+describe("dedup semantico (coseno)", () => {
+  it("vectores identicos = 1", () => {
+    expect(cosineSim([1, 0, 1], [1, 0, 1])).toBeCloseTo(1, 6);
+  });
+
+  it("vectores ortogonales = 0", () => {
+    expect(cosineSim([1, 0], [0, 1])).toBe(0);
+  });
+
+  it("detecta duplicado semantico por encima del umbral", () => {
+    const existentes = [
+      [1, 0, 0],
+      [0, 1, 0],
+    ];
+    expect(esDuplicadoSemantico([0.98, 0.02, 0], existentes, 0.9)).toBe(true);
+    expect(esDuplicadoSemantico([0.4, 0.4, 0.8], existentes, 0.9)).toBe(false);
   });
 });

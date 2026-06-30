@@ -184,6 +184,8 @@ export const preguntas = pgTable(
     // Cita legal / temario que respalda la respuesta (citacion obligatoria)
     fuente: text("fuente"),
     dificultad: dificultadEnum("dificultad").notNull().default("media"),
+    // Embedding del enunciado (para dedup semantico). null = sin calcular.
+    embedding: jsonb("embedding").$type<number[]>(),
     // Procede de un examen oficial real (vs generada/elaborada)
     oficial: boolean("oficial").notNull().default(false),
     revisada: boolean("revisada").notNull().default(false),

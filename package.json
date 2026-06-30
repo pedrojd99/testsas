@@ -19,6 +19,7 @@
     "ingest": "tsx --env-file=.env.local scripts/ingestar.ts",
     "gen": "tsx --env-file=.env.local scripts/generar.ts",
     "gen-temario": "tsx --env-file=.env.local scripts/generar-temario.ts",
+    "embed": "tsx --env-file=.env.local scripts/embed-preguntas.ts",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android",
     "cap:icons": "tsx scripts/gen-iconos.ts && capacitor-assets generate --android",

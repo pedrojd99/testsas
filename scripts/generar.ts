@@ -1,8 +1,11 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { embedTextos, embeddingsDisponibles } from "../lib/ai/embeddings";
 import { generarPreguntas } from "../lib/ai/generador";
 import { validarPregunta } from "../lib/ai/validador";
 import { categorias, db, preguntas, temario, temas } from "../lib/db";
-import { dedupLote } from "../lib/dedup";
+import { dedupLote, esDuplicadoSemantico } from "../lib/dedup";
+
+const UMBRAL_SEMANTICO = 0.9;
 
 // Uso:
 //   pnpm gen                      -> genera para todo el temario
@@ -43,6 +46,9 @@ async function main() {
   let descartadas = 0;
   let duplicadas = 0;
 
+  const usaEmbeddings = embeddingsDisponibles();
+  console.log(`Dedup semantico (embeddings): ${usaEmbeddings ? "activo" : "no (solo lexico)"}`);
+
   // Enunciados ya existentes por categoria (para evitar casi-duplicados)
   const vistosPorCategoria = new Map<string, string[]>();
   async function getVistos(categoriaId: string): Promise<string[]> {
@@ -54,6 +60,20 @@ async function main() {
       .where(eq(preguntas.categoriaId, categoriaId));
     const lista = filas.map((p) => p.enunciado);
     vistosPorCategoria.set(categoriaId, lista);
+    return lista;
+  }
+
+  // Embeddings existentes por categoria (para el dedup semantico)
+  const embsPorCategoria = new Map<string, number[][]>();
+  async function getEmbs(categoriaId: string): Promise<number[][]> {
+    const cache = embsPorCategoria.get(categoriaId);
+    if (cache) return cache;
+    const filas = await db
+      .select({ embedding: preguntas.embedding })
+      .from(preguntas)
+      .where(and(eq(preguntas.categoriaId, categoriaId), isNotNull(preguntas.embedding)));
+    const lista = filas.map((p) => p.embedding as number[]);
+    embsPorCategoria.set(categoriaId, lista);
     return lista;
   }
 
@@ -80,15 +100,38 @@ async function main() {
       }
     }
 
-    // Dedup: descarta casi-duplicados de lo ya existente y dentro del lote
+    // 1) Dedup lexico: descarta casi-duplicados por tokens (barato)
     const vistos = await getVistos(f.categoriaId);
     const antes = aprobadas.length;
     const unicas = dedupLote(aprobadas, vistos, 0.8);
     duplicadas += antes - unicas.length;
 
-    if (unicas.length > 0) {
+    // 2) Dedup semantico: embeddings + coseno (si hay clave de Voyage)
+    let finales = unicas;
+    let vectores: (number[] | null)[] = unicas.map(() => null);
+    if (usaEmbeddings && unicas.length > 0) {
+      const vecs = await embedTextos(unicas.map((u) => u.enunciado));
+      if (vecs) {
+        const existentes = await getEmbs(f.categoriaId);
+        const aceptadas: typeof unicas = [];
+        const aceptadasVec: number[][] = [];
+        for (let i = 0; i < unicas.length; i++) {
+          if (esDuplicadoSemantico(vecs[i], existentes, UMBRAL_SEMANTICO)) {
+            duplicadas++;
+            continue;
+          }
+          aceptadas.push(unicas[i]);
+          aceptadasVec.push(vecs[i]);
+          existentes.push(vecs[i]); // dedup tambien dentro del lote
+        }
+        finales = aceptadas;
+        vectores = aceptadasVec;
+      }
+    }
+
+    if (finales.length > 0) {
       await db.insert(preguntas).values(
-        unicas.map((p) => ({
+        finales.map((p, i) => ({
           categoriaId: f.categoriaId,
           temaId: f.temaId,
           temarioId: f.temarioId,
@@ -98,19 +141,20 @@ async function main() {
           explicacion: p.explicacion,
           fuente: p.fuente,
           dificultad: p.dificultad,
+          embedding: vectores[i],
           oficial: false,
           revisada: true,
         })),
       );
       await db
         .update(temario)
-        .set({ preguntasGeneradas: sql`${temario.preguntasGeneradas} + ${unicas.length}` })
+        .set({ preguntasGeneradas: sql`${temario.preguntasGeneradas} + ${finales.length}` })
         .where(eq(temario.id, f.temarioId));
-      insertadas += unicas.length;
+      insertadas += finales.length;
     }
 
     console.log(
-      `  [${f.categoriaSlug}/${f.tema}] generadas ${candidatas.length}, insertadas ${unicas.length}`,
+      `  [${f.categoriaSlug}/${f.tema}] generadas ${candidatas.length}, insertadas ${finales.length}`,
     );
   }
 
