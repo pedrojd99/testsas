@@ -19,6 +19,7 @@
     "gen-temario": "tsx --env-file=.env.local scripts/generar-temario.ts",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android",
+    "cap:icons": "tsx scripts/gen-iconos.ts && capacitor-assets generate --android",
     "android:apk": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
@@ -44,14 +45,17 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@capacitor/android": "6",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "6",
     "@capacitor/core": "6",
+    "@img/sharp-win32-x64": "0.35.2",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.28.0",
     "postcss": "^8.4.49",
+    "sharp": "^0.35.2",
     "tailwindcss": "^3.4.14",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"

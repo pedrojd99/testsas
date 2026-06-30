@@ -16,3 +16,6 @@ android/local.properties
 android/app/release
 *.apk
 *.aab
+
+# Build info
+tsconfig.tsbuildinfo
