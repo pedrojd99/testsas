@@ -18,11 +18,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es" className={`${inter.variable} ${newsreader.variable}`}>
       <body>
-        <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
+        <div className="h-1 w-full bg-primary" />
+        <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
           <div className="container flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="font-display text-xl font-semibold tracking-tight">TestSAS</span>
-              <span className="chip">2027</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="emblema font-display text-lg font-semibold leading-none">+</span>
+              <span className="flex items-center gap-2">
+                <span className="font-display text-xl font-semibold tracking-tight">TestSAS</span>
+                <span className="chip">SAS 2027</span>
+              </span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
               <Link href="/categorias" className="text-muted-foreground hover:text-foreground">

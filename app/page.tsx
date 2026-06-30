@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { getCategorias } from "@/lib/queries";
-import { ArrowRight, BarChart3, BrainCircuit, Clock, FileCheck2 } from "lucide-react";
+import { ArrowRight, BarChart3, BrainCircuit, Clock, FileCheck2, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 export default async function HomePage() {
@@ -8,32 +8,48 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="hero-radial">
-        <div className="container py-20 md:py-28">
+      <section className="relative overflow-hidden border-b">
+        <div className="cross-grid bg-grid-fade absolute inset-0 opacity-70" />
+        <div className="hero-radial absolute inset-0" />
+        <div className="container relative py-20 md:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <span className="chip mb-6">Megaconvocatoria SAS 2027</span>
-            <h1 className="text-balance font-display text-4xl font-semibold leading-tight md:text-6xl">
-              Prepara las oposiciones del SAS a base de test
+            <span className="badge-oficial mb-6">
+              <ShieldCheck className="h-3.5 w-3.5" /> Servicio Andaluz de Salud · OPE 2027
+            </span>
+            <h1 className="text-balance font-display text-4xl font-semibold leading-[1.05] md:text-6xl">
+              Aprueba tu plaza en el SAS a base de test
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-muted-foreground">
-              Miles de preguntas tipo test, simulacros cronometrados con el formato real del
-              Servicio Andaluz de Salud, estadisticas de tu progreso y un tutor con IA que te
-              explica cada fallo.
+              Banco de preguntas generado del temario oficial, simulacros cronometrados con el
+              formato y la penalizacion reales del Servicio Andaluz de Salud, estadisticas de tu
+              progreso y un tutor con IA que explica cada fallo citando la norma.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/registro"
-                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground shadow-soft hover:bg-primary/90"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 font-medium text-primary-foreground shadow-elevated transition-colors hover:bg-primary/90"
               >
                 Empezar gratis <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/categorias"
-                className="inline-flex items-center gap-2 rounded-md border px-6 py-3 font-medium hover:bg-accent"
+                className="inline-flex items-center gap-2 rounded-md border bg-card px-6 py-3 font-medium hover:bg-accent"
               >
                 Ver oposiciones
               </Link>
             </div>
+          </div>
+        </div>
+
+        {/* Franja institucional: categorias como indice oficial */}
+        <div className="relative border-t bg-card/60 backdrop-blur">
+          <div className="container flex flex-wrap items-center justify-center gap-x-8 gap-y-2 py-4 text-sm">
+            <span className="eyebrow">Categorias</span>
+            {["Celador", "TCAE", "Enfermeria", "Aux. Administrativo"].map((c) => (
+              <span key={c} className="font-medium text-foreground/80">
+                {c}
+              </span>
+            ))}
           </div>
         </div>
       </section>

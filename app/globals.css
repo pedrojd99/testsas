@@ -1,49 +1,59 @@
+/* Hallmark · macrostructure: redesign (in-place) · genre: modern-minimal
+ * theme: custom (sanitary teal · institutional) · tone: institutional-trust
+ * anchor hue: teal-green ~172 · display: Newsreader · body: Inter */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 150 30% 98%;
-    --foreground: 175 30% 11%;
+    --background: 174 33% 98%;
+    --foreground: 192 33% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 175 30% 11%;
+    --card-foreground: 192 33% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 175 30% 11%;
+    --popover-foreground: 192 33% 10%;
 
-    /* Verde sanitario SAS */
-    --primary: 167 72% 30%;
+    /* Verde-teal sanitario SAS (institucional, clinico) */
+    --primary: 174 80% 24%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 14% 96%;
-    --secondary-foreground: 175 30% 11%;
+    /* Teal clinico mas claro para acentos sutiles */
+    --clinical: 172 58% 40%;
 
-    --muted: 160 14% 96%;
-    --muted-foreground: 175 9% 42%;
+    --secondary: 168 18% 96%;
+    --secondary-foreground: 192 33% 10%;
 
-    --accent: 160 30% 93%;
-    --accent-foreground: 175 30% 11%;
+    --muted: 168 18% 95%;
+    --muted-foreground: 192 12% 38%;
 
-    --destructive: 0 72% 51%;
+    --accent: 170 34% 92%;
+    --accent-foreground: 192 33% 10%;
+
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 145 63% 38%;
+    --success: 150 62% 36%;
     --success-foreground: 0 0% 100%;
 
-    --border: 160 16% 90%;
-    --input: 160 16% 90%;
-    --ring: 167 72% 30%;
+    --border: 168 20% 89%;
+    --input: 168 20% 89%;
+    --ring: 174 80% 24%;
 
     --radius: 0.625rem;
 
-    --shadow-sm: 0 1px 3px 0 rgb(6 38 30 / 0.06), 0 1px 2px -1px rgb(6 38 30 / 0.04);
-    --shadow-md: 0 4px 8px -2px rgb(6 38 30 / 0.06), 0 2px 4px -2px rgb(6 38 30 / 0.04);
-    --shadow-lg: 0 12px 24px -8px rgb(6 38 30 / 0.1), 0 4px 8px -4px rgb(6 38 30 / 0.06);
+    --shadow-sm: 0 1px 2px 0 rgb(4 38 34 / 0.05), 0 1px 1px -1px rgb(4 38 34 / 0.04);
+    --shadow-md: 0 4px 10px -3px rgb(4 38 34 / 0.07), 0 2px 4px -2px rgb(4 38 34 / 0.05);
+    --shadow-lg: 0 16px 32px -12px rgb(4 38 34 / 0.13), 0 6px 12px -6px rgb(4 38 34 / 0.07);
 
-    --gradient-hero: radial-gradient(ellipse at top, hsl(167 72% 30% / 0.08) 0%, transparent 55%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(160 14% 99%) 100%);
+    --gradient-hero: radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      hsl(174 80% 24% / 0.1) 0%,
+      transparent 60%
+    );
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(170 22% 99%) 100%);
   }
 
   .dark {
@@ -56,8 +66,10 @@
     --popover: 175 25% 9%;
     --popover-foreground: 160 14% 95%;
 
-    --primary: 162 64% 46%;
+    --primary: 168 66% 46%;
     --primary-foreground: 175 30% 6%;
+
+    --clinical: 168 50% 52%;
 
     --secondary: 175 18% 15%;
     --secondary-foreground: 160 14% 95%;
@@ -115,11 +127,24 @@
   .chip {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20;
   }
+  /* Eyebrow institucional: marca de regla + versalitas */
   .eyebrow {
-    @apply text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+    @apply inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-6 bg-primary/50;
   }
   .numeral {
-    @apply font-display text-4xl md:text-5xl leading-none text-primary/30 tabular-nums;
+    @apply font-display text-4xl md:text-5xl leading-none text-primary/25 tabular-nums;
+  }
+  /* Regla fina institucional */
+  .rule {
+    @apply h-px w-full bg-border;
+  }
+  /* Badge oficial (sello sobrio) */
+  .badge-oficial {
+    @apply inline-flex items-center gap-1.5 rounded-md border border-primary/25 bg-primary/[0.06] px-2.5 py-1 text-xs font-medium text-primary;
   }
   .bg-grid {
     background-image: radial-gradient(circle, hsl(var(--border)) 1px, transparent 1px);
@@ -128,6 +153,15 @@
   .bg-grid-fade {
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  }
+  /* Patron tematico: cruces sanitarias muy sutiles */
+  .cross-grid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M20 15h4v5h5v4h-5v5h-4v-5h-5v-4h5z' fill='%230d7264' fill-opacity='0.05'/%3E%3C/svg%3E");
+    background-size: 44px 44px;
+  }
+  /* Emblema de marca: cruz sanitaria en pastilla */
+  .emblema {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-soft;
   }
 }
 
