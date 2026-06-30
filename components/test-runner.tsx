@@ -2,7 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { type RespuestaEnviada, finalizarSesion } from "@/lib/actions/test";
-import { ChevronLeft, ChevronRight, Clock, Flag } from "lucide-react";
+import {
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Flag,
+  XCircle,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface PreguntaRunner {
@@ -10,6 +18,9 @@ interface PreguntaRunner {
   enunciado: string;
   opciones: string[];
   dificultad: string;
+  correctaIndex?: number;
+  explicacion?: string | null;
+  fuente?: string | null;
 }
 
 const LETRAS = ["A", "B", "C", "D"];
@@ -26,12 +37,14 @@ export function TestRunner({
   modo,
   tiempoLimiteSeg,
   startedAt,
+  feedbackInmediato = false,
 }: {
   sesionId: string;
   preguntas: PreguntaRunner[];
   modo: string;
   tiempoLimiteSeg?: number | null;
   startedAt?: string;
+  feedbackInmediato?: boolean;
 }) {
   const [actual, setActual] = useState(0);
   const [respuestas, setRespuestas] = useState<Record<string, number | null>>({});
@@ -76,7 +89,12 @@ export function TestRunner({
     return () => clearInterval(id);
   }, [finMs, enviar]);
 
+  // En modo estudio, una vez respondida se revela la solucion y se bloquea
+  const elegida = respuestas[pregunta.preguntaId];
+  const revelada = feedbackInmediato && elegida !== undefined && elegida !== null;
+
   function elegir(opcion: number) {
+    if (revelada) return;
     setRespuestas((prev) => ({ ...prev, [pregunta.preguntaId]: opcion }));
   }
 
@@ -173,30 +191,56 @@ export function TestRunner({
 
         <div className="mt-6 space-y-2">
           {pregunta.opciones.map((opcion, idx) => {
-            const elegida = respuestas[pregunta.preguntaId] === idx;
+            const esElegida = elegida === idx;
+            const esCorrecta = revelada && idx === pregunta.correctaIndex;
+            const esFalloElegido = revelada && esElegida && idx !== pregunta.correctaIndex;
+            const cls = esCorrecta
+              ? "border-success/50 bg-success/10"
+              : esFalloElegido
+                ? "border-destructive/50 bg-destructive/10"
+                : esElegida
+                  ? "border-primary bg-primary/5"
+                  : revelada
+                    ? "border-border opacity-70"
+                    : "hover:bg-accent";
             return (
               <button
                 key={idx}
                 type="button"
                 onClick={() => elegir(idx)}
-                className={`flex w-full items-start gap-3 rounded-md border p-3 text-left text-sm transition-colors ${
-                  elegida ? "border-primary bg-primary/5" : "hover:bg-accent"
-                }`}
+                disabled={revelada}
+                className={`flex w-full items-start gap-3 rounded-md border p-3 text-left text-sm transition-colors ${cls}`}
               >
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
-                    elegida ? "border-primary bg-primary text-primary-foreground" : "border-input"
+                    esElegida && !revelada
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-input"
                   }`}
                 >
                   {LETRAS[idx]}
                 </span>
-                <span className="pt-0.5">{opcion}</span>
+                <span className="flex-1 pt-0.5">{opcion}</span>
+                {esCorrecta && <CheckCircle2 className="h-5 w-5 shrink-0 text-success" />}
+                {esFalloElegido && <XCircle className="h-5 w-5 shrink-0 text-destructive" />}
               </button>
             );
           })}
         </div>
 
-        {respuestas[pregunta.preguntaId] !== undefined && (
+        {/* Modo estudio: explicacion tras responder */}
+        {revelada && pregunta.explicacion && (
+          <div className="mt-4 rounded-md bg-muted/50 p-3 text-sm">
+            <p className="text-muted-foreground">{pregunta.explicacion}</p>
+            {pregunta.fuente && (
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-primary">
+                <BookOpen className="h-3.5 w-3.5" /> {pregunta.fuente}
+              </p>
+            )}
+          </div>
+        )}
+
+        {!feedbackInmediato && elegida !== undefined && (
           <button
             type="button"
             onClick={() => setRespuestas((p) => ({ ...p, [pregunta.preguntaId]: null }))}

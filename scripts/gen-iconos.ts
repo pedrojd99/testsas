@@ -49,7 +49,10 @@ async function main() {
   await png(cruz(1024, 0.5, TEAL), "icon-only.png");
   // Adaptativo: primer plano (cruz, zona segura) + fondo (teal solido)
   await png(cruz(1024, 0.42, null), "icon-foreground.png");
-  await png(`<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><rect width="1024" height="1024" fill="${TEAL}"/></svg>`, "icon-background.png");
+  await png(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><rect width="1024" height="1024" fill="${TEAL}"/></svg>`,
+    "icon-background.png",
+  );
   // Splash claro y oscuro
   await png(splash(2732, TEAL), "splash.png");
   await png(splash(2732, TEAL_DARK), "splash-dark.png");

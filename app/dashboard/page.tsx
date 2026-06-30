@@ -1,8 +1,10 @@
+import { NotaTrend } from "@/components/nota-trend";
 import { salir } from "@/lib/actions/auth";
 import { iniciarSesion } from "@/lib/actions/test";
+import { setOposicionPreferida } from "@/lib/actions/user";
 import { getSession } from "@/lib/auth";
-import { getDashboard } from "@/lib/queries";
-import { Flame, RotateCcw, TrendingDown } from "lucide-react";
+import { getCategorias, getDashboard } from "@/lib/queries";
+import { Clock, Flame, GraduationCap, RotateCcw, TrendingDown, Zap } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -12,11 +14,13 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { recientes, totales, porTema, repasoPendiente, racha } = await getDashboard(session.uid);
+  const { recientes, totales, porTema, repasoPendiente, racha, tendencia, preferida } =
+    await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
     totalRespondidas > 0 ? Math.round((Number(totales.aciertos) / totalRespondidas) * 100) : 0;
   const slugRepaso = recientes[0]?.categoria.slug;
+  const categorias = await getCategorias();
 
   return (
     <div className="container py-12">
@@ -34,8 +38,77 @@ export default async function DashboardPage() {
         </form>
       </div>
 
+      {/* Mi oposicion (inicio rapido) */}
+      {preferida ? (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border bg-card p-5 shadow-soft">
+          <div className="flex items-center gap-3">
+            <span className="emblema">
+              <GraduationCap className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="eyebrow">Mi oposicion</p>
+              <p className="font-display text-lg font-semibold">{preferida.nombre}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <QuickStart
+              slug={preferida.slug}
+              modo="simulacro"
+              label="Simulacro"
+              icon={<Clock className="h-4 w-4" />}
+            />
+            <QuickStart
+              slug={preferida.slug}
+              modo="rapido"
+              label="Test rapido"
+              icon={<Zap className="h-4 w-4" />}
+            />
+            <Link
+              href={`/categorias/${preferida.slug}`}
+              className="rounded-md border px-3 py-2 text-sm hover:bg-accent"
+            >
+              Por tema
+            </Link>
+            <Link
+              href={`/categorias/${preferida.slug}/temario`}
+              className="rounded-md border px-3 py-2 text-sm hover:bg-accent"
+            >
+              Temario
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <form
+          action={setOposicionPreferida}
+          className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-dashed bg-card p-5"
+        >
+          <GraduationCap className="h-5 w-5 text-primary" />
+          <p className="text-sm">Elige tu oposicion para tener acceso rapido:</p>
+          <select
+            name="categoriaSlug"
+            className="rounded-md border bg-background px-2 py-1.5 text-sm"
+            defaultValue=""
+          >
+            <option value="" disabled>
+              Selecciona...
+            </option>
+            {categorias.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {c.nombre}
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Guardar
+          </button>
+        </form>
+      )}
+
       {/* KPIs */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Kpi label="Test completados" value={Number(totales.sesiones)} />
         <Kpi label="Precision global" value={`${precisionGlobal}%`} />
         <Kpi label="Aciertos" value={Number(totales.aciertos)} className="text-success" />
@@ -73,6 +146,12 @@ export default async function DashboardPage() {
           </button>
         </form>
       )}
+
+      {/* Evolucion de la nota */}
+      <section className="mt-10 rounded-lg border bg-card p-5 shadow-soft">
+        <h2 className="mb-4 font-display text-xl font-semibold">Evolucion de tu nota</h2>
+        <NotaTrend notas={tendencia} />
+      </section>
 
       <div className="mt-10 grid gap-8 lg:grid-cols-2">
         {/* Temas debiles */}
@@ -163,6 +242,32 @@ export default async function DashboardPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+function QuickStart({
+  slug,
+  modo,
+  label,
+  icon,
+}: {
+  slug: string;
+  modo: string;
+  label: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <form action={iniciarSesion}>
+      <input type="hidden" name="categoriaSlug" value={slug} />
+      <input type="hidden" name="modo" value={modo} />
+      <button
+        type="submit"
+        className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+      >
+        {icon}
+        {label}
+      </button>
+    </form>
   );
 }
 

@@ -8,8 +8,9 @@ import {
   respuestas,
   sesiones,
   temas,
+  usuarios,
 } from "@/lib/db";
-import { and, count, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
 
 // Slug de la categoria estructural que agrupa el temario comun una sola vez.
 export const COMUN_SLUG = "comun";
@@ -78,6 +79,29 @@ export async function getSesionParaRunner(sesionId: string, usuarioId: string) {
       enunciado: preguntas.enunciado,
       opciones: preguntas.opciones,
       dificultad: preguntas.dificultad,
+    })
+    .from(respuestas)
+    .innerJoin(preguntas, eq(respuestas.preguntaId, preguntas.id))
+    .where(eq(respuestas.sesionId, sesionId))
+    .orderBy(respuestas.createdAt);
+
+  return { sesion, preguntas: filas };
+}
+
+// Igual que el runner pero CON la solucion (solo modo estudio / feedback inmediato)
+export async function getSesionParaRunnerEstudio(sesionId: string, usuarioId: string) {
+  const sesion = await db.query.sesiones.findFirst({ where: eq(sesiones.id, sesionId) });
+  if (!sesion || sesion.usuarioId !== usuarioId) return null;
+
+  const filas = await db
+    .select({
+      preguntaId: preguntas.id,
+      enunciado: preguntas.enunciado,
+      opciones: preguntas.opciones,
+      dificultad: preguntas.dificultad,
+      correctaIndex: preguntas.correctaIndex,
+      explicacion: preguntas.explicacion,
+      fuente: preguntas.fuente,
     })
     .from(respuestas)
     .innerJoin(preguntas, eq(respuestas.preguntaId, preguntas.id))
@@ -201,6 +225,33 @@ export async function getDashboard(usuarioId: string) {
 
   const racha = await getRacha(usuarioId);
 
+  // Tendencia: nota de las ultimas sesiones, en orden cronologico
+  const tendenciaRows = await db
+    .select({ nota: sesiones.nota, finishedAt: sesiones.finishedAt })
+    .from(sesiones)
+    .where(
+      and(
+        eq(sesiones.usuarioId, usuarioId),
+        isNotNull(sesiones.finishedAt),
+        isNotNull(sesiones.nota),
+      ),
+    )
+    .orderBy(desc(sesiones.finishedAt))
+    .limit(15);
+  const tendencia = tendenciaRows.reverse().map((r) => Number(r.nota));
+
+  // Oposicion preferida (inicio rapido)
+  const user = await db.query.usuarios.findFirst({
+    where: eq(usuarios.id, usuarioId),
+    columns: { categoriaPreferidaId: true },
+  });
+  const preferida = user?.categoriaPreferidaId
+    ? await db.query.categorias.findFirst({
+        where: eq(categorias.id, user.categoriaPreferidaId),
+        columns: { slug: true, nombre: true },
+      })
+    : null;
+
   return {
     recientes,
     totales,
@@ -210,6 +261,8 @@ export async function getDashboard(usuarioId: string) {
     })),
     repasoPendiente: pendientes?.total ?? 0,
     racha,
+    tendencia,
+    preferida,
   };
 }
 

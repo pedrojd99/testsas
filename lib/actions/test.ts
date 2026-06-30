@@ -115,6 +115,8 @@ export async function iniciarSesion(formData: FormData) {
     conPenalizacion: true,
     penalizacionDivisor: 3,
     tiempoLimiteSeg: modo === "simulacro" ? 100 * 60 : undefined,
+    // Modo estudio solo en test por tema
+    feedbackInmediato: modo === "tema" && formData.get("feedbackInmediato") === "1",
   };
 
   const ids = await seleccionarPreguntaIds(session.uid, categoria.id, modo, config);

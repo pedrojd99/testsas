@@ -43,6 +43,8 @@ export const usuarios = pgTable(
     nombre: text("nombre"),
     rol: rolEnum("rol").notNull().default("learner"),
     plan: planEnum("plan").notNull().default("free"),
+    // Oposicion preferida para el inicio rapido (se fija por slug en runtime)
+    categoriaPreferidaId: uuid("categoria_preferida_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({
@@ -275,6 +277,8 @@ export interface SesionConfig {
   penalizacionDivisor?: number;
   tiempoLimiteSeg?: number;
   soloOficiales?: boolean;
+  // Modo estudio: revela la solucion tras cada respuesta (solo test por tema)
+  feedbackInmediato?: boolean;
 }
 
 // ---------------------------------------------------------------------------

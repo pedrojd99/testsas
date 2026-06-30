@@ -52,10 +52,22 @@ export function TemaSelector({
         />
       )}
 
-      <div className="mt-6 flex items-center justify-between border-t pt-4">
-        <p className="text-sm text-muted-foreground">
-          {seleccion.size} temas · {totalSel} preguntas disponibles
-        </p>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="feedbackInmediato"
+              value="1"
+              defaultChecked
+              className="h-4 w-4 accent-[hsl(var(--primary))]"
+            />
+            Modo estudio
+          </label>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {seleccion.size} temas · {totalSel} preguntas · ves la solucion tras cada respuesta
+          </p>
+        </div>
         <Button type="submit" disabled={seleccion.size === 0}>
           Empezar test
         </Button>

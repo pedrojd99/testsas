@@ -2,6 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import { generarPreguntas } from "../lib/ai/generador";
 import { validarPregunta } from "../lib/ai/validador";
 import { categorias, db, preguntas, temario, temas } from "../lib/db";
+import { dedupLote } from "../lib/dedup";
 
 // Uso:
 //   pnpm gen                      -> genera para todo el temario
@@ -40,6 +41,21 @@ async function main() {
   let generadas = 0;
   let insertadas = 0;
   let descartadas = 0;
+  let duplicadas = 0;
+
+  // Enunciados ya existentes por categoria (para evitar casi-duplicados)
+  const vistosPorCategoria = new Map<string, string[]>();
+  async function getVistos(categoriaId: string): Promise<string[]> {
+    const cache = vistosPorCategoria.get(categoriaId);
+    if (cache) return cache;
+    const filas = await db
+      .select({ enunciado: preguntas.enunciado })
+      .from(preguntas)
+      .where(eq(preguntas.categoriaId, categoriaId));
+    const lista = filas.map((p) => p.enunciado);
+    vistosPorCategoria.set(categoriaId, lista);
+    return lista;
+  }
 
   for (const f of fragmentos) {
     const candidatas = await generarPreguntas({
@@ -64,9 +80,15 @@ async function main() {
       }
     }
 
-    if (aprobadas.length > 0) {
+    // Dedup: descarta casi-duplicados de lo ya existente y dentro del lote
+    const vistos = await getVistos(f.categoriaId);
+    const antes = aprobadas.length;
+    const unicas = dedupLote(aprobadas, vistos, 0.8);
+    duplicadas += antes - unicas.length;
+
+    if (unicas.length > 0) {
       await db.insert(preguntas).values(
-        aprobadas.map((p) => ({
+        unicas.map((p) => ({
           categoriaId: f.categoriaId,
           temaId: f.temaId,
           temarioId: f.temarioId,
@@ -82,18 +104,18 @@ async function main() {
       );
       await db
         .update(temario)
-        .set({ preguntasGeneradas: sql`${temario.preguntasGeneradas} + ${aprobadas.length}` })
+        .set({ preguntasGeneradas: sql`${temario.preguntasGeneradas} + ${unicas.length}` })
         .where(eq(temario.id, f.temarioId));
-      insertadas += aprobadas.length;
+      insertadas += unicas.length;
     }
 
     console.log(
-      `  [${f.categoriaSlug}/${f.tema}] generadas ${candidatas.length}, aprobadas ${aprobadas.length}`,
+      `  [${f.categoriaSlug}/${f.tema}] generadas ${candidatas.length}, insertadas ${unicas.length}`,
     );
   }
 
   console.log(
-    `\nResumen: ${generadas} generadas · ${insertadas} insertadas · ${descartadas} descartadas por el validador.`,
+    `\nResumen: ${generadas} generadas · ${insertadas} insertadas · ${descartadas} descartadas (validador) · ${duplicadas} casi-duplicadas.`,
   );
   process.exit(0);
 }
