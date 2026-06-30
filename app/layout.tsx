@@ -43,6 +43,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/categorias" className="text-muted-foreground hover:text-foreground">
                 Oposiciones
               </Link>
+              <Link href="/convocatoria" className="text-muted-foreground hover:text-foreground">
+                Convocatoria
+              </Link>
               {session ? (
                 <>
                   {session.rol === "admin" && (
