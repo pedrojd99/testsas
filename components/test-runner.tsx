@@ -124,7 +124,9 @@ export function TestRunner({
     <div className="container max-w-3xl py-8">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <span className="eyebrow">{modo === "simulacro" ? "Simulacro" : "Test"}</span>
+          <span className="eyebrow">
+            {modo === "simulacro" ? "Simulacro" : modo === "oficial" ? "Examen oficial" : "Test"}
+          </span>
           <p className="text-sm text-muted-foreground">
             Pregunta {actual + 1} de {preguntas.length} · {respondidas} respondidas
             {marcadas.size > 0 && ` · ${marcadas.size} marcadas`}

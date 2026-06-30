@@ -3,6 +3,7 @@ import {
   apuntes,
   categorias,
   db,
+  examenesOficiales,
   preguntas,
   progresoPregunta,
   respuestas,
@@ -86,6 +87,31 @@ export async function getSesionParaRunner(sesionId: string, usuarioId: string) {
     .orderBy(respuestas.createdAt);
 
   return { sesion, preguntas: filas };
+}
+
+// Examenes oficiales historicos de una categoria, con su numero de preguntas
+export async function getExamenesOficiales(categoriaSlug: string) {
+  const categoria = await db.query.categorias.findFirst({
+    where: eq(categorias.slug, categoriaSlug),
+  });
+  if (!categoria) return null;
+
+  const examenes = await db.query.examenesOficiales.findMany({
+    where: eq(examenesOficiales.categoriaId, categoria.id),
+    orderBy: (e, { desc }) => desc(e.anio),
+  });
+
+  const counts = await db
+    .select({ examenId: preguntas.examenOficialId, total: count() })
+    .from(preguntas)
+    .where(eq(preguntas.categoriaId, categoria.id))
+    .groupBy(preguntas.examenOficialId);
+  const countMap = new Map(counts.map((c) => [c.examenId, c.total]));
+
+  return {
+    categoria,
+    examenes: examenes.map((e) => ({ ...e, totalPreguntas: countMap.get(e.id) ?? 0 })),
+  };
 }
 
 // Igual que el runner pero CON la solucion (solo modo estudio / feedback inmediato)

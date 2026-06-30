@@ -21,7 +21,14 @@ export const rolEnum = pgEnum("rol", ["learner", "admin"]);
 export const planEnum = pgEnum("plan", ["free", "premium"]);
 export const bloqueEnum = pgEnum("bloque", ["comun", "especifica"]);
 export const dificultadEnum = pgEnum("dificultad", ["facil", "media", "dificil"]);
-export const modoEnum = pgEnum("modo", ["tema", "simulacro", "falladas", "rapido", "repaso"]);
+export const modoEnum = pgEnum("modo", [
+  "tema",
+  "simulacro",
+  "falladas",
+  "rapido",
+  "repaso",
+  "oficial",
+]);
 export const subStatusEnum = pgEnum("sub_status", [
   "active",
   "trialing",
@@ -134,6 +141,26 @@ export const apuntes = pgTable(
   }),
 );
 
+// Examenes oficiales historicos: un conjunto fijo y ordenado de preguntas
+// reales de una convocatoria pasada, para practicar en condiciones de examen.
+export const examenesOficiales = pgTable(
+  "examenes_oficiales",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    categoriaId: uuid("categoria_id")
+      .notNull()
+      .references(() => categorias.id, { onDelete: "cascade" }),
+    anio: integer("anio").notNull(),
+    titulo: text("titulo").notNull(),
+    descripcion: text("descripcion"),
+    tiempoMin: integer("tiempo_min").notNull().default(120),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    categoriaIdx: index("examenes_categoria_idx").on(t.categoriaId),
+  }),
+);
+
 export const preguntas = pgTable(
   "preguntas",
   {
@@ -144,6 +171,11 @@ export const preguntas = pgTable(
     temaId: uuid("tema_id").references(() => temas.id, { onDelete: "set null" }),
     // Fragmento de temario del que se genero (trazabilidad)
     temarioId: uuid("temario_id").references(() => temario.id, { onDelete: "set null" }),
+    // Si pertenece a un examen oficial historico, con su posicion en el
+    examenOficialId: uuid("examen_oficial_id").references(() => examenesOficiales.id, {
+      onDelete: "set null",
+    }),
+    posicion: integer("posicion"),
     enunciado: text("enunciado").notNull(),
     // 4 opciones en orden; correctaIndex apunta a la correcta (0-3)
     opciones: jsonb("opciones").$type<string[]>().notNull(),
@@ -312,6 +344,14 @@ export const apuntesRelations = relations(apuntes, ({ one }) => ({
     fields: [apuntes.temaId],
     references: [temas.id],
   }),
+}));
+
+export const examenesOficialesRelations = relations(examenesOficiales, ({ one, many }) => ({
+  categoria: one(categorias, {
+    fields: [examenesOficiales.categoriaId],
+    references: [categorias.id],
+  }),
+  preguntas: many(preguntas),
 }));
 
 export const preguntasRelations = relations(preguntas, ({ one }) => ({

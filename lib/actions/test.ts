@@ -5,6 +5,7 @@ import {
   type SesionConfig,
   categorias,
   db,
+  examenesOficiales,
   preguntas,
   progresoPregunta,
   respuestas,
@@ -136,6 +137,49 @@ export async function iniciarSesion(formData: FormData) {
     .returning();
 
   // Una fila por pregunta (en blanco hasta responder); fija el set y el orden
+  await db
+    .insert(respuestas)
+    .values(ids.map((preguntaId) => ({ sesionId: sesion.id, preguntaId })));
+
+  redirect(`/test/${sesion.id}`);
+}
+
+// Inicia un examen oficial historico: conjunto fijo de preguntas en su orden
+export async function iniciarExamenOficial(formData: FormData) {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const examenId = String(formData.get("examenId"));
+  const examen = await db.query.examenesOficiales.findFirst({
+    where: eq(examenesOficiales.id, examenId),
+  });
+  if (!examen) redirect("/categorias");
+
+  const filas = await db
+    .select({ id: preguntas.id })
+    .from(preguntas)
+    .where(and(eq(preguntas.examenOficialId, examenId), eq(preguntas.activa, true)))
+    .orderBy(preguntas.posicion);
+  const ids = filas.map((r) => r.id);
+  if (ids.length === 0) redirect("/categorias");
+
+  const config: SesionConfig = {
+    conPenalizacion: true,
+    penalizacionDivisor: 3,
+    tiempoLimiteSeg: examen.tiempoMin * 60,
+  };
+
+  const [sesion] = await db
+    .insert(sesiones)
+    .values({
+      usuarioId: session.uid,
+      categoriaId: examen.categoriaId,
+      modo: "oficial",
+      config,
+      totalPreguntas: ids.length,
+    })
+    .returning();
+
   await db
     .insert(respuestas)
     .values(ids.map((preguntaId) => ({ sesionId: sesion.id, preguntaId })));

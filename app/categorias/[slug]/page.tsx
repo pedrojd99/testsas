@@ -35,12 +35,18 @@ export default async function CategoriaDetallePage({
         {categoria.totalPreguntas} preguntas en el banco
       </p>
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-wrap gap-2">
         <a
           href={`/categorias/${slug}/temario`}
           className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm hover:bg-accent"
         >
           Estudiar el temario y escucharlo
+        </a>
+        <a
+          href={`/categorias/${slug}/examenes`}
+          className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm hover:bg-accent"
+        >
+          Examenes oficiales
         </a>
       </div>
 
