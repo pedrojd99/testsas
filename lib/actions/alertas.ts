@@ -1,9 +1,10 @@
 "use server";
 
+import { enviarAvisoConvocatoria } from "@/lib/alertas-envio";
 import { getSession } from "@/lib/auth";
 import { alertas, categorias, db } from "@/lib/db";
 import { enviarEmail, plantilla } from "@/lib/email";
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -86,26 +87,6 @@ export async function enviarAlertaConvocatoria(formData: FormData) {
     categoriaId = c?.id ?? null;
   }
 
-  // Suscriptores de esa categoria + los de "todas" (categoriaId null)
-  const destinatarios = await db.query.alertas.findMany({
-    where: categoriaId
-      ? or(eq(alertas.categoriaId, categoriaId), isNull(alertas.categoriaId))
-      : undefined,
-  });
-
-  for (const d of destinatarios) {
-    await enviarEmail({
-      to: d.email,
-      subject: asunto,
-      html: plantilla(
-        asunto,
-        `<p>${mensaje.replace(/\n/g, "<br/>")}</p>
-         <p><a href="${APP_URL}/convocatoria">Ver la guia de la convocatoria</a></p>
-         <p style="font-size:12px;color:#889"><a href="${APP_URL}/alertas/baja?token=${d.token}">Darse de baja</a></p>`,
-      ),
-    });
-    await db.update(alertas).set({ notificadoEn: new Date() }).where(eq(alertas.id, d.id));
-  }
-
-  redirect(`/admin/alertas?enviados=${destinatarios.length}`);
+  const enviados = await enviarAvisoConvocatoria({ categoriaId, asunto, mensaje });
+  redirect(`/admin/alertas?enviados=${enviados}`);
 }

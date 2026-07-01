@@ -318,6 +318,22 @@ export const alertas = pgTable(
   }),
 );
 
+// Detecciones del BOJA ya procesadas por el cron (para no avisar dos veces).
+export const deteccionesBoja = pgTable(
+  "detecciones_boja",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    referencia: text("referencia").notNull(), // URL o id del BOJA
+    titulo: text("titulo").notNull(),
+    categoriaSlug: text("categoria_slug"), // null = generico / todas
+    notificados: integer("notificados").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    refIdx: uniqueIndex("detecciones_ref_idx").on(t.referencia),
+  }),
+);
+
 // ---------------------------------------------------------------------------
 // Tipos auxiliares
 // ---------------------------------------------------------------------------

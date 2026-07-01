@@ -1,3 +1,4 @@
+import { ComprobarBoja } from "@/components/comprobar-boja";
 import { enviarAlertaConvocatoria } from "@/lib/actions/alertas";
 import { getSession } from "@/lib/auth";
 import { getCategoriasParaFiltro, getResumenAlertas } from "@/lib/queries-admin";
@@ -57,6 +58,7 @@ export default async function AdminAlertasPage({
             <p className="text-sm text-muted-foreground">Aun no hay suscriptores por categoria.</p>
           )}
         </div>
+        <ComprobarBoja />
       </div>
 
       {/* Enviar aviso */}

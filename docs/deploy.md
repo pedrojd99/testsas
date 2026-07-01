@@ -40,6 +40,17 @@ pnpm gen-temario comun  # genera los apuntes del resto de temas
    | `STRIPE_WEBHOOK_SECRET` | (tras crear el webhook) |
    | `STRIPE_PRICE_PREMIUM_MENSUAL` | id del precio mensual |
    | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | clave publicable de Stripe |
+   | `RESEND_API_KEY` / `EMAIL_FROM` | envio de alertas por email (opcional) |
+   | `CRON_SECRET` | secreto del cron del BOJA (Vercel lo envia como Bearer) |
+   | `BOJA_FEED_URL` | RSS o pagina del BOJA a vigilar (SAS + oferta de empleo) |
+
+### Cron del BOJA (alertas automaticas)
+
+`vercel.json` define un cron diario (08:00) a `/api/cron/boja`. Vercel lo invoca
+con `Authorization: Bearer $CRON_SECRET`. El endpoint lee `BOJA_FEED_URL`, detecta
+convocatorias nuevas del SAS y avisa por email a los suscriptores. Un admin puede
+lanzarlo a mano desde `/admin/alertas` ("Comprobar el BOJA ahora"). Ajusta las
+palabras clave y el parser en `lib/boja.ts` cuando pruebes contra la URL real.
 
 3. Deploy. El build (`next build`) no necesita BD (las paginas son dinamicas).
 
