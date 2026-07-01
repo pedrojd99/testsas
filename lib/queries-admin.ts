@@ -1,6 +1,6 @@
 import "server-only";
-import { categorias, db, preguntas, temario, temas } from "@/lib/db";
-import { and, count, desc, eq, ilike, sql } from "drizzle-orm";
+import { alertas, categorias, db, preguntas, temario, temas } from "@/lib/db";
+import { and, count, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 export interface PreguntasFiltro {
   categoriaSlug?: string;
@@ -92,4 +92,25 @@ export async function getCategoriasParaFiltro() {
     columns: { slug: true, nombre: true },
     orderBy: (c, { asc }) => asc(c.orden),
   });
+}
+
+export async function getResumenAlertas() {
+  const [total] = await db.select({ total: count() }).from(alertas);
+
+  const [todas] = await db
+    .select({ total: count() })
+    .from(alertas)
+    .where(isNull(alertas.categoriaId));
+
+  const porCategoria = await db
+    .select({ categoria: categorias.nombre, slug: categorias.slug, total: count() })
+    .from(alertas)
+    .innerJoin(categorias, eq(alertas.categoriaId, categorias.id))
+    .groupBy(categorias.nombre, categorias.slug);
+
+  return {
+    total: Number(total?.total ?? 0),
+    todas: Number(todas?.total ?? 0),
+    porCategoria,
+  };
 }

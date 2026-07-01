@@ -299,6 +299,25 @@ export const suscripciones = pgTable(
   }),
 );
 
+// Alertas por email: aviso cuando salga la convocatoria de una categoria.
+// Abierto tambien a visitantes sin cuenta (captacion de leads).
+export const alertas = pgTable(
+  "alertas",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    // null = todas las categorias
+    categoriaId: uuid("categoria_id").references(() => categorias.id, { onDelete: "cascade" }),
+    token: text("token").notNull(),
+    notificadoEn: timestamp("notificado_en", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    uniq: uniqueIndex("alertas_email_categoria_idx").on(t.email, t.categoriaId),
+    categoriaIdx: index("alertas_categoria_idx").on(t.categoriaId),
+  }),
+);
+
 // ---------------------------------------------------------------------------
 // Tipos auxiliares
 // ---------------------------------------------------------------------------

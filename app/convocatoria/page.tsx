@@ -1,4 +1,6 @@
+import { AlertaForm } from "@/components/alerta-form";
 import { GUIA_CONVOCATORIA as G } from "@/lib/content/convocatoria";
+import { getCategorias } from "@/lib/queries";
 import {
   BookOpen,
   CalendarClock,
@@ -24,7 +26,8 @@ const AMBITO: Record<string, string> = {
   bases: "Bases",
 };
 
-export default function ConvocatoriaPage() {
+export default async function ConvocatoriaPage() {
+  const categorias = await getCategorias();
   return (
     <div className="pb-16">
       {/* Hero */}
@@ -43,6 +46,9 @@ export default function ConvocatoriaPage() {
       </section>
 
       <div className="container max-w-4xl space-y-14 py-12">
+        {/* Alerta por email */}
+        <AlertaForm categorias={categorias.map((c) => ({ slug: c.slug, nombre: c.nombre }))} />
+
         {/* Modalidades */}
         <Section icon={<Users className="h-5 w-5" />} titulo="Modalidades de acceso">
           <div className="grid gap-4 sm:grid-cols-2">

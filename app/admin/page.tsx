@@ -70,6 +70,12 @@ export default async function AdminPage() {
         >
           Revisar pendientes
         </Link>
+        <Link
+          href="/admin/alertas"
+          className="ml-2 rounded-md border px-4 py-2 text-sm hover:bg-accent"
+        >
+          Alertas de convocatoria
+        </Link>
       </div>
     </div>
   );
