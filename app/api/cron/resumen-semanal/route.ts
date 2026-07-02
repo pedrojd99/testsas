@@ -1,6 +1,11 @@
 import { getSession } from "@/lib/auth";
 import { enviarEmail, plantilla } from "@/lib/email";
-import { getResumenSemanal } from "@/lib/queries-cron";
+import { enviarPushUsuario } from "@/lib/push";
+import {
+  getRankingSemanaPasada,
+  getResumenSemanal,
+  getUsuariosPushConPreferida,
+} from "@/lib/queries-cron";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -43,5 +48,27 @@ export async function GET(req: NextRequest) {
     enviados++;
   }
 
-  return NextResponse.json({ ok: true, enviados });
+  // Push del ranking: posicion final de la semana pasada en la oposicion preferida.
+  const usuariosPush = await getUsuariosPushConPreferida();
+  const rankingsPorCat = new Map<string, Awaited<ReturnType<typeof getRankingSemanaPasada>>>();
+  let pushEnviados = 0;
+
+  for (const { usuarioId, categoriaId } of usuariosPush) {
+    let ranking = rankingsPorCat.get(categoriaId);
+    if (!ranking) {
+      ranking = await getRankingSemanaPasada(categoriaId);
+      rankingsPorCat.set(categoriaId, ranking);
+    }
+    const pos = ranking.get(usuarioId);
+    if (!pos) continue;
+    const n = await enviarPushUsuario(usuarioId, {
+      title: "Tu ranking de la semana",
+      body: `Terminaste en el puesto #${pos.puesto} de ${pos.total}. ¿Subes esta semana?`,
+      url: "/ranking",
+      tag: "ranking",
+    });
+    if (n > 0) pushEnviados++;
+  }
+
+  return NextResponse.json({ ok: true, enviados, pushEnviados });
 }

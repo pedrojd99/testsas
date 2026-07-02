@@ -325,6 +325,25 @@ export const alertas = pgTable(
   }),
 );
 
+// Suscripciones Web Push (una por dispositivo/navegador del usuario).
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    usuarioId: uuid("usuario_id")
+      .notNull()
+      .references(() => usuarios.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    endpointIdx: uniqueIndex("push_endpoint_idx").on(t.endpoint),
+    usuarioIdx: index("push_usuario_idx").on(t.usuarioId),
+  }),
+);
+
 // Detecciones del BOJA ya procesadas por el cron (para no avisar dos veces).
 export const deteccionesBoja = pgTable(
   "detecciones_boja",

@@ -1,6 +1,7 @@
 import { Logros } from "@/components/logros";
 import { NotaTrend } from "@/components/nota-trend";
 import { PlanEstudio } from "@/components/plan-estudio";
+import { PushToggle } from "@/components/push-toggle";
 import { salir } from "@/lib/actions/auth";
 import { iniciarSesion } from "@/lib/actions/test";
 import { setOposicionPreferida, setResumenEmail } from "@/lib/actions/user";
@@ -323,19 +324,27 @@ export default async function DashboardPage() {
         </section>
       </div>
 
-      {/* Ajustes de email */}
-      <form
-        action={setResumenEmail}
-        className="mt-10 flex flex-wrap items-center gap-3 border-t pt-6 text-sm text-muted-foreground"
-      >
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="recibirResumen" value="1" defaultChecked={recibirResumen} />
-          Recibir el resumen semanal por email
-        </label>
-        <button type="submit" className="rounded-md border px-3 py-1.5 hover:bg-accent">
-          Guardar
-        </button>
-      </form>
+      {/* Ajustes de avisos */}
+      <div className="mt-10 space-y-4 border-t pt-6">
+        <PushToggle />
+        <form
+          action={setResumenEmail}
+          className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground"
+        >
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="recibirResumen"
+              value="1"
+              defaultChecked={recibirResumen}
+            />
+            Recibir el resumen semanal por email
+          </label>
+          <button type="submit" className="rounded-md border px-3 py-1.5 hover:bg-accent">
+            Guardar
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
