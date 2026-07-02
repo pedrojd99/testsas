@@ -175,7 +175,66 @@ export async function getSesionResultado(sesionId: string, usuarioId: string) {
     columns: { nota: true },
   });
 
-  return { sesion, preguntas: filas, notaAnterior: anterior?.nota ?? null };
+  const percentil = await getPercentil(sesion.categoriaId, sesion.modo, sesion.nota);
+
+  return { sesion, preguntas: filas, notaAnterior: anterior?.nota ?? null, percentil };
+}
+
+// Percentil anonimo entre todos los intentos de la misma oposicion y modo.
+// Solo significativo con muestra suficiente; devuelve null si no hay bastantes.
+const PERCENTIL_MIN_MUESTRA = 10;
+
+export async function getPercentil(
+  categoriaId: string,
+  modo: (typeof sesiones.$inferSelect)["modo"],
+  nota: number | null,
+): Promise<{ valor: number; muestra: number } | null> {
+  if (nota === null) return null;
+  const [row] = await db
+    .select({
+      total: count(),
+      debajo: sql<number>`sum(case when ${sesiones.nota} <= ${nota} then 1 else 0 end)`,
+    })
+    .from(sesiones)
+    .where(
+      and(
+        eq(sesiones.categoriaId, categoriaId),
+        eq(sesiones.modo, modo),
+        isNotNull(sesiones.finishedAt),
+        isNotNull(sesiones.nota),
+      ),
+    );
+
+  const total = Number(row?.total ?? 0);
+  if (total < PERCENTIL_MIN_MUESTRA) return null;
+  const valor = Math.round((Number(row?.debajo ?? 0) / total) * 100);
+  return { valor, muestra: total };
+}
+
+export interface BuscadorItem {
+  temaId: string;
+  nombre: string;
+  categoria: string;
+  bloque: "comun" | "especifica";
+  tieneApuntes: boolean;
+}
+
+// Indice ligero para el buscador global (temas de todas las oposiciones).
+export async function getBuscadorIndice(): Promise<BuscadorItem[]> {
+  const filas = await db
+    .select({
+      temaId: temas.id,
+      nombre: temas.nombre,
+      categoria: categorias.nombre,
+      bloque: temas.bloque,
+      tieneApuntes: sql<boolean>`${apuntes.id} is not null`,
+    })
+    .from(temas)
+    .innerJoin(categorias, eq(temas.categoriaId, categorias.id))
+    .leftJoin(apuntes, eq(apuntes.temaId, temas.id))
+    .orderBy(categorias.orden, temas.bloque, temas.orden);
+
+  return filas.map((f) => ({ ...f, bloque: f.bloque as "comun" | "especifica" }));
 }
 
 // Indice del temario de una categoria (comun + especifico), en orden,

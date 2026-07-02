@@ -1,3 +1,6 @@
+import { BottomNav } from "@/components/bottom-nav";
+import { CommandPaletteProvider } from "@/components/command-palette";
+import { CommandTrigger } from "@/components/command-trigger";
 import { PwaRegister } from "@/components/pwa-register";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/auth";
@@ -40,67 +43,86 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <div className="h-1 w-full bg-primary" />
-        <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
-          <div className="container flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="emblema font-display text-lg font-semibold leading-none">+</span>
-              <span className="flex items-center gap-2">
-                <span className="font-display text-xl font-semibold tracking-tight">TestSAS</span>
-                <span className="chip">SAS 2027</span>
-              </span>
-            </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link href="/categorias" className="text-muted-foreground hover:text-foreground">
-                Oposiciones
+        <CommandPaletteProvider>
+          <div className="h-1 w-full bg-primary" />
+          <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
+            <div className="container flex h-16 items-center justify-between">
+              <Link href="/" className="flex items-center gap-2.5">
+                <span className="emblema font-display text-lg font-semibold leading-none">+</span>
+                <span className="flex items-center gap-2">
+                  <span className="font-display text-xl font-semibold tracking-tight">TestSAS</span>
+                  <span className="chip">SAS 2027</span>
+                </span>
               </Link>
-              <Link href="/convocatoria" className="text-muted-foreground hover:text-foreground">
-                Convocatoria
-              </Link>
-              <ThemeToggle />
-              {session ? (
-                <>
-                  {session.rol === "admin" && (
-                    <Link href="/admin" className="text-muted-foreground hover:text-foreground">
-                      Admin
+              <nav className="flex items-center gap-3 text-sm sm:gap-4">
+                <Link
+                  href="/categorias"
+                  className="hidden text-muted-foreground hover:text-foreground sm:inline"
+                >
+                  Oposiciones
+                </Link>
+                <Link
+                  href="/convocatoria"
+                  className="hidden text-muted-foreground hover:text-foreground sm:inline"
+                >
+                  Convocatoria
+                </Link>
+                <CommandTrigger />
+                <ThemeToggle />
+                {session ? (
+                  <>
+                    {session.rol === "admin" && (
+                      <Link
+                        href="/admin"
+                        className="hidden text-muted-foreground hover:text-foreground sm:inline"
+                      >
+                        Admin
+                      </Link>
+                    )}
+                    <Link
+                      href="/dashboard"
+                      className="hidden text-muted-foreground hover:text-foreground sm:inline"
+                    >
+                      Mi panel
                     </Link>
-                  )}
-                  <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
-                    Mi panel
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
-                  >
-                    {session.email.split("@")[0]}
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/login" className="text-muted-foreground hover:text-foreground">
-                    Entrar
-                  </Link>
-                  <Link
-                    href="/registro"
-                    className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
-                  >
-                    Empezar gratis
-                  </Link>
-                </>
-              )}
-            </nav>
-          </div>
-        </header>
-        <PwaRegister />
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
-        <footer className="border-t py-8">
-          <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
-            <p>TestSAS — Preparacion para las oposiciones del Servicio Andaluz de Salud.</p>
-            <p className="text-xs">
-              Proyecto independiente, sin vinculacion oficial con el SAS ni la Junta de Andalucia.
-            </p>
-          </div>
-        </footer>
+                    <Link
+                      href="/dashboard"
+                      className="max-w-[8rem] truncate rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
+                    >
+                      {session.email.split("@")[0]}
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="hidden text-muted-foreground hover:text-foreground sm:inline"
+                    >
+                      Entrar
+                    </Link>
+                    <Link
+                      href="/registro"
+                      className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
+                    >
+                      Empezar
+                    </Link>
+                  </>
+                )}
+              </nav>
+            </div>
+          </header>
+          <PwaRegister />
+          <main className="min-h-[calc(100vh-4rem)] pb-16 sm:pb-0">{children}</main>
+          <footer className="border-t py-8 pb-24 sm:pb-8">
+            <div className="container flex flex-col items-center gap-2 text-center text-sm text-muted-foreground">
+              <p>TestSAS — Preparacion para las oposiciones del Servicio Andaluz de Salud.</p>
+              <p className="text-xs">
+                Proyecto independiente, sin vinculacion oficial con el SAS ni la Junta de Andalucia.
+              </p>
+            </div>
+          </footer>
+          <BottomNav autenticado={!!session} />
+        </CommandPaletteProvider>
       </body>
     </html>
   );

@@ -57,6 +57,8 @@ export const usuarios = pgTable(
     objetivoDiario: integer("objetivo_diario").notNull().default(20),
     // Recibir el resumen semanal por email
     recibirResumen: boolean("recibir_resumen").notNull().default(true),
+    // Ha completado el onboarding de 3 pasos tras registrarse
+    onboardingCompletado: boolean("onboarding_completado").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({

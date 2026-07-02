@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 import type { SesionConfig } from "@/lib/db";
 import { getSesionResultado } from "@/lib/queries";
 import { corregir } from "@/lib/scoring";
-import { BookOpen, CheckCircle2, Circle, GraduationCap, XCircle } from "lucide-react";
+import { BookOpen, CheckCircle2, Circle, GraduationCap, Users, XCircle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -80,6 +80,33 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
           </div>
         </div>
       </div>
+
+      {/* Percentil anonimo entre opositores */}
+      {data.percentil && (
+        <div className="mt-4 rounded-lg border bg-card p-5 shadow-soft">
+          <div className="flex items-center justify-between gap-3">
+            <p className="flex items-center gap-1.5 text-sm font-medium">
+              <Users className="h-4 w-4 text-primary" />
+              Superas al{" "}
+              <span className="font-display text-lg font-semibold text-primary">
+                {data.percentil.valor}%
+              </span>{" "}
+              de quienes hicieron este {sesion.modo}
+            </p>
+            <span className="text-xs text-muted-foreground">percentil {data.percentil.valor}</span>
+          </div>
+          <div className="relative mt-3 h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${data.percentil.valor}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Comparativa orientativa sobre {data.percentil.muestra} intentos de{" "}
+            {data.sesion.categoria.nombre}.
+          </p>
+        </div>
+      )}
 
       <div className="mt-4 flex gap-3">
         <Link

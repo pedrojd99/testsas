@@ -37,7 +37,7 @@ export async function registrar(_prev: { error?: string } | undefined, formData:
     .returning();
 
   await createSession({ uid: user.id, email: user.email, rol: user.rol, plan: user.plan });
-  redirect("/dashboard");
+  redirect("/onboarding");
 }
 
 export async function entrar(_prev: { error?: string } | undefined, formData: FormData) {

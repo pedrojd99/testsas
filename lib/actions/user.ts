@@ -23,6 +23,36 @@ export async function setOposicionPreferida(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+// Guarda las preferencias del onboarding y lo marca como completado.
+// No redirige: el cliente decide si empezar un test o ir al panel.
+export async function completarOnboarding(datos: {
+  categoriaSlug?: string;
+  fechaExamen?: string;
+  objetivoDiario?: number;
+}): Promise<{ ok: true }> {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const categoria = datos.categoriaSlug
+    ? await db.query.categorias.findFirst({ where: eq(categorias.slug, datos.categoriaSlug) })
+    : null;
+
+  const objetivo = datos.objetivoDiario ? Math.max(5, Math.min(200, datos.objetivoDiario)) : 20;
+
+  await db
+    .update(usuarios)
+    .set({
+      categoriaPreferidaId: categoria?.id ?? null,
+      fechaExamen: datos.fechaExamen ? new Date(datos.fechaExamen) : null,
+      objetivoDiario: objetivo,
+      onboardingCompletado: true,
+    })
+    .where(eq(usuarios.id, session.uid));
+
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
 export async function setResumenEmail(formData: FormData) {
   const session = await getSession();
   if (!session) redirect("/login");
