@@ -52,6 +52,9 @@ export const usuarios = pgTable(
     plan: planEnum("plan").notNull().default("free"),
     // Oposicion preferida para el inicio rapido (se fija por slug en runtime)
     categoriaPreferidaId: uuid("categoria_preferida_id"),
+    // Plan de estudio: fecha objetivo del examen y meta diaria de preguntas
+    fechaExamen: timestamp("fecha_examen", { withTimezone: true }),
+    objetivoDiario: integer("objetivo_diario").notNull().default(20),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({

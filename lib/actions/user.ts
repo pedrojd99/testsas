@@ -22,3 +22,21 @@ export async function setOposicionPreferida(formData: FormData) {
 
   revalidatePath("/dashboard");
 }
+
+export async function setPlanEstudio(formData: FormData) {
+  const session = await getSession();
+  if (!session) redirect("/login");
+
+  const fecha = String(formData.get("fechaExamen") ?? "");
+  const objetivo = Number(formData.get("objetivoDiario")) || 20;
+
+  await db
+    .update(usuarios)
+    .set({
+      fechaExamen: fecha ? new Date(fecha) : null,
+      objetivoDiario: Math.max(5, Math.min(200, objetivo)),
+    })
+    .where(eq(usuarios.id, session.uid));
+
+  revalidatePath("/dashboard");
+}

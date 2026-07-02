@@ -294,10 +294,10 @@ export async function getDashboard(usuarioId: string) {
     .limit(15);
   const tendencia = tendenciaRows.reverse().map((r) => Number(r.nota));
 
-  // Oposicion preferida (inicio rapido)
+  // Oposicion preferida + plan de estudio
   const user = await db.query.usuarios.findFirst({
     where: eq(usuarios.id, usuarioId),
-    columns: { categoriaPreferidaId: true },
+    columns: { categoriaPreferidaId: true, fechaExamen: true, objetivoDiario: true },
   });
   const preferida = user?.categoriaPreferidaId
     ? await db.query.categorias.findFirst({
@@ -305,6 +305,38 @@ export async function getDashboard(usuarioId: string) {
         columns: { slug: true, nombre: true },
       })
     : null;
+
+  // Preguntas respondidas hoy (sesiones finalizadas hoy)
+  const [hoy] = await db
+    .select({ total: sql<number>`coalesce(sum(${sesiones.totalPreguntas}), 0)` })
+    .from(sesiones)
+    .where(
+      and(
+        eq(sesiones.usuarioId, usuarioId),
+        isNotNull(sesiones.finishedAt),
+        sql`(${sesiones.finishedAt} at time zone 'UTC')::date = (now() at time zone 'UTC')::date`,
+      ),
+    );
+  const respondidasHoy = Number(hoy?.total ?? 0);
+
+  const objetivoDiario = user?.objetivoDiario ?? 20;
+  let plan: {
+    fechaExamen: string | null;
+    objetivoDiario: number;
+    respondidasHoy: number;
+    diasRestantes: number | null;
+  } | null = null;
+  if (user?.fechaExamen || respondidasHoy > 0) {
+    const diasRestantes = user?.fechaExamen
+      ? Math.max(0, Math.ceil((user.fechaExamen.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+      : null;
+    plan = {
+      fechaExamen: user?.fechaExamen ? user.fechaExamen.toISOString().slice(0, 10) : null,
+      objetivoDiario,
+      respondidasHoy,
+      diasRestantes,
+    };
+  }
 
   return {
     recientes,
@@ -318,6 +350,7 @@ export async function getDashboard(usuarioId: string) {
     tendencia,
     preferida,
     enCurso,
+    plan,
   };
 }
 

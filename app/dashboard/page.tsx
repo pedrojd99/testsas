@@ -1,4 +1,5 @@
 import { NotaTrend } from "@/components/nota-trend";
+import { PlanEstudio } from "@/components/plan-estudio";
 import { salir } from "@/lib/actions/auth";
 import { iniciarSesion } from "@/lib/actions/test";
 import { setOposicionPreferida } from "@/lib/actions/user";
@@ -22,8 +23,17 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { recientes, totales, porTema, repasoPendiente, racha, tendencia, preferida, enCurso } =
-    await getDashboard(session.uid);
+  const {
+    recientes,
+    totales,
+    porTema,
+    repasoPendiente,
+    racha,
+    tendencia,
+    preferida,
+    enCurso,
+    plan,
+  } = await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
     totalRespondidas > 0 ? Math.round((Number(totales.aciertos) / totalRespondidas) * 100) : 0;
@@ -133,6 +143,9 @@ export default async function DashboardPage() {
           </button>
         </form>
       )}
+
+      {/* Plan de estudio */}
+      <PlanEstudio plan={plan} />
 
       {/* KPIs */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
