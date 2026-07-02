@@ -1,9 +1,11 @@
+import { CompartirResultado } from "@/components/compartir-resultado";
+import { Donut } from "@/components/donut";
 import { TutorButton } from "@/components/tutor-button";
 import { getSession } from "@/lib/auth";
 import type { SesionConfig } from "@/lib/db";
 import { getSesionResultado } from "@/lib/queries";
 import { corregir } from "@/lib/scoring";
-import { BookOpen, CheckCircle2, Circle, XCircle } from "lucide-react";
+import { BookOpen, CheckCircle2, Circle, GraduationCap, XCircle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -38,26 +40,46 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
       <h1 className="mt-2 font-display text-3xl font-semibold">{data.sesion.categoria.nombre}</h1>
 
       {/* Resumen */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        <div className="rounded-lg border bg-card p-5 text-center shadow-soft sm:col-span-1">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Nota</p>
-          <p
-            className={`font-display text-4xl font-semibold ${aprobado ? "text-success" : "text-destructive"}`}
-          >
-            {res.nota.toFixed(2)}
+      <div className="mt-6 flex flex-col items-center gap-6 rounded-lg border bg-card p-6 shadow-soft sm:flex-row sm:items-center">
+        <Donut aciertos={sesion.aciertos} fallos={sesion.fallos} enBlanco={sesion.enBlanco} />
+        <div className="flex-1">
+          <div className="flex items-end gap-3">
+            <span
+              className={`font-display text-5xl font-semibold ${aprobado ? "text-success" : "text-destructive"}`}
+            >
+              {res.nota.toFixed(2)}
+            </span>
+            <span className="pb-1 text-sm text-muted-foreground">/ 10</span>
+            {data.notaAnterior != null && (
+              <span
+                className={`pb-1 text-sm font-medium ${
+                  res.nota >= data.notaAnterior ? "text-success" : "text-destructive"
+                }`}
+              >
+                {res.nota >= data.notaAnterior ? "▲" : "▼"}{" "}
+                {Math.abs(res.nota - data.notaAnterior).toFixed(2)} vs anterior
+              </span>
+            )}
+          </div>
+          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            <span className="text-success">{sesion.aciertos} aciertos</span>
+            <span className="text-destructive">{sesion.fallos} fallos</span>
+            <span className="text-muted-foreground">{sesion.enBlanco} en blanco</span>
           </p>
-          <p className="text-xs text-muted-foreground">sobre 10</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Neto tras penalizacion: {res.puntosNetos.toFixed(2)} / {sesion.totalPreguntas}
+            {config.conPenalizacion && ` · cada fallo resta 1/${config.penalizacionDivisor ?? 3}`}
+          </p>
+          <div className="mt-4">
+            <CompartirResultado
+              nota={res.nota}
+              categoria={data.sesion.categoria.nombre}
+              aciertos={sesion.aciertos}
+              total={sesion.totalPreguntas}
+            />
+          </div>
         </div>
-        <Stat label="Aciertos" value={sesion.aciertos} className="text-success" />
-        <Stat label="Fallos" value={sesion.fallos} className="text-destructive" />
-        <Stat label="En blanco" value={sesion.enBlanco} className="text-muted-foreground" />
       </div>
-
-      <p className="mt-3 text-sm text-muted-foreground">
-        Puntuacion neta tras penalizacion: <strong>{res.puntosNetos.toFixed(2)}</strong> /{" "}
-        {sesion.totalPreguntas}
-        {config.conPenalizacion && ` · cada fallo resta 1/${config.penalizacionDivisor ?? 3}`}
-      </p>
 
       <div className="mt-4 flex gap-3">
         <Link
@@ -133,7 +155,17 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
                     </div>
                   )}
                   {!p.esCorrecta && (
-                    <TutorButton preguntaId={p.preguntaId} opcionElegida={p.opcionElegida} />
+                    <div className="mt-3 flex flex-wrap items-center gap-4">
+                      <TutorButton preguntaId={p.preguntaId} opcionElegida={p.opcionElegida} />
+                      {p.temaId && (
+                        <Link
+                          href={`/temario/${p.temaId}`}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                        >
+                          <GraduationCap className="h-3.5 w-3.5" /> Estudiar este tema
+                        </Link>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -141,15 +173,6 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
           );
         })}
       </div>
-    </div>
-  );
-}
-
-function Stat({ label, value, className }: { label: string; value: number; className?: string }) {
-  return (
-    <div className="rounded-lg border bg-card p-5 text-center shadow-soft">
-      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className={`font-display text-3xl font-semibold ${className ?? ""}`}>{value}</p>
     </div>
   );
 }

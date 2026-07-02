@@ -153,6 +153,7 @@ export async function getSesionResultado(sesionId: string, usuarioId: string) {
       correctaIndex: preguntas.correctaIndex,
       explicacion: preguntas.explicacion,
       fuente: preguntas.fuente,
+      temaId: preguntas.temaId,
       opcionElegida: respuestas.opcionElegida,
       esCorrecta: respuestas.esCorrecta,
     })
@@ -161,7 +162,20 @@ export async function getSesionResultado(sesionId: string, usuarioId: string) {
     .where(eq(respuestas.sesionId, sesionId))
     .orderBy(respuestas.createdAt);
 
-  return { sesion, preguntas: filas };
+  // Nota del intento anterior de la misma categoria y modo (comparativa)
+  const anterior = await db.query.sesiones.findFirst({
+    where: and(
+      eq(sesiones.usuarioId, usuarioId),
+      eq(sesiones.categoriaId, sesion.categoriaId),
+      eq(sesiones.modo, sesion.modo),
+      isNotNull(sesiones.finishedAt),
+      sql`${sesiones.startedAt} < ${sesion.startedAt}`,
+    ),
+    orderBy: (s, { desc }) => desc(s.startedAt),
+    columns: { nota: true },
+  });
+
+  return { sesion, preguntas: filas, notaAnterior: anterior?.nota ?? null };
 }
 
 // Indice del temario de una categoria (comun + especifico), en orden,
