@@ -1,12 +1,10 @@
 import { BottomNav } from "@/components/bottom-nav";
 import { CommandPaletteProvider } from "@/components/command-palette";
-import { CommandTrigger } from "@/components/command-trigger";
 import { PwaRegister } from "@/components/pwa-register";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { SiteHeader } from "@/components/site-header";
 import { getSession } from "@/lib/auth";
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
-import Link from "next/link";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -44,73 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <CommandPaletteProvider>
-          <div className="h-1 w-full bg-primary" />
-          <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
-            <div className="container flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center gap-2.5">
-                <span className="emblema font-display text-lg font-semibold leading-none">+</span>
-                <span className="flex items-center gap-2">
-                  <span className="font-display text-xl font-semibold tracking-tight">TestSAS</span>
-                  <span className="chip">SAS 2027</span>
-                </span>
-              </Link>
-              <nav className="flex items-center gap-3 text-sm sm:gap-4">
-                <Link
-                  href="/categorias"
-                  className="hidden text-muted-foreground hover:text-foreground sm:inline"
-                >
-                  Oposiciones
-                </Link>
-                <Link
-                  href="/convocatoria"
-                  className="hidden text-muted-foreground hover:text-foreground sm:inline"
-                >
-                  Convocatoria
-                </Link>
-                <CommandTrigger />
-                <ThemeToggle />
-                {session ? (
-                  <>
-                    {session.rol === "admin" && (
-                      <Link
-                        href="/admin"
-                        className="hidden text-muted-foreground hover:text-foreground sm:inline"
-                      >
-                        Admin
-                      </Link>
-                    )}
-                    <Link
-                      href="/dashboard"
-                      className="hidden text-muted-foreground hover:text-foreground sm:inline"
-                    >
-                      Mi panel
-                    </Link>
-                    <Link
-                      href="/dashboard"
-                      className="max-w-[8rem] truncate rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
-                    >
-                      {session.email.split("@")[0]}
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      className="hidden text-muted-foreground hover:text-foreground sm:inline"
-                    >
-                      Entrar
-                    </Link>
-                    <Link
-                      href="/registro"
-                      className="rounded-md bg-primary px-3 py-1.5 text-primary-foreground"
-                    >
-                      Empezar
-                    </Link>
-                  </>
-                )}
-              </nav>
-            </div>
-          </header>
+          <SiteHeader session={session ? { email: session.email, rol: session.rol } : null} />
           <PwaRegister />
           <main className="min-h-[calc(100vh-4rem)] pb-16 sm:pb-0">{children}</main>
           <footer className="border-t py-8 pb-24 sm:pb-8">
