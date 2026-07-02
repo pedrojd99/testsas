@@ -1,7 +1,15 @@
 "use client";
 
 import type { BuscadorItem } from "@/lib/queries";
-import { BookOpen, Compass, FileText, LayoutDashboard, Search, Volume2 } from "lucide-react";
+import {
+  BookOpen,
+  Compass,
+  FileText,
+  LayoutDashboard,
+  Search,
+  Trophy,
+  Volume2,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   createContext,
@@ -52,6 +60,14 @@ const ACCIONES: Accion[] = [
     sub: "Elegir categoría y hacer test",
     href: "/categorias",
     icon: Compass,
+  },
+  {
+    tipo: "accion",
+    id: "ranking",
+    nombre: "Ranking semanal",
+    sub: "Clasificación anónima de opositores",
+    href: "/ranking",
+    icon: Trophy,
   },
   {
     tipo: "accion",

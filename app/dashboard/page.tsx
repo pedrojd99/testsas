@@ -13,6 +13,7 @@ import {
   PlayCircle,
   RotateCcw,
   TrendingDown,
+  Trophy,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
@@ -36,6 +37,7 @@ export default async function DashboardPage() {
     plan,
     mejorNota,
     recibirResumen,
+    rankingResumen,
   } = await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
@@ -165,6 +167,31 @@ export default async function DashboardPage() {
           </p>
         </div>
       </div>
+
+      {/* Ranking semanal */}
+      <Link
+        href="/ranking"
+        className="mt-6 flex items-center justify-between gap-3 rounded-lg border bg-card p-4 shadow-soft transition-colors hover:bg-accent"
+      >
+        <div className="flex items-center gap-3">
+          <span className="emblema">
+            <Trophy className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="eyebrow">Ranking semanal</p>
+            {rankingResumen ? (
+              <p className="text-sm">
+                Vas <strong>#{rankingResumen.puesto}</strong> de {rankingResumen.total} esta semana
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Compite de forma anónima con otros opositores
+              </p>
+            )}
+          </div>
+        </div>
+        <span className="text-sm font-medium text-primary">Ver</span>
+      </Link>
 
       {/* Repaso de hoy (espaciado) */}
       {repasoPendiente > 0 && slugRepaso && (

@@ -211,6 +211,75 @@ export async function getPercentil(
   return { valor, muestra: total };
 }
 
+export interface RankingEntrada {
+  puesto: number;
+  nota: number;
+  esTuyo: boolean;
+}
+export interface RankingSemanal {
+  total: number;
+  top: RankingEntrada[];
+  tu: { puesto: number; nota: number } | null;
+}
+
+// Ranking semanal anonimo por oposicion: mejor nota de cada opositor en la
+// semana ISO actual. Se reinicia solo cada lunes (date_trunc 'week').
+const RANKING_MIN_PARTICIPANTES = 3;
+
+export async function getRankingSemanal(
+  categoriaId: string,
+  usuarioId: string,
+): Promise<RankingSemanal> {
+  const filas = await db
+    .select({
+      usuarioId: sesiones.usuarioId,
+      mejor: sql<number>`max(${sesiones.nota})`,
+    })
+    .from(sesiones)
+    .where(
+      and(
+        eq(sesiones.categoriaId, categoriaId),
+        isNotNull(sesiones.finishedAt),
+        isNotNull(sesiones.nota),
+        sql`date_trunc('week', ${sesiones.finishedAt}) = date_trunc('week', now())`,
+      ),
+    )
+    .groupBy(sesiones.usuarioId)
+    .orderBy(sql`max(${sesiones.nota}) desc`);
+
+  // Ranking de competicion (empates comparten puesto): 1, 2, 2, 4...
+  let puesto = 0;
+  let prev: number | null = null;
+  const ranked = filas.map((f, i) => {
+    const nota = Number(f.mejor);
+    if (prev === null || nota < prev) puesto = i + 1;
+    prev = nota;
+    return { usuarioId: f.usuarioId, nota, puesto };
+  });
+
+  const tuEntrada = ranked.find((r) => r.usuarioId === usuarioId) ?? null;
+
+  return {
+    total: ranked.length,
+    top: ranked.slice(0, 10).map((r) => ({
+      puesto: r.puesto,
+      nota: r.nota,
+      esTuyo: r.usuarioId === usuarioId,
+    })),
+    tu: tuEntrada ? { puesto: tuEntrada.puesto, nota: tuEntrada.nota } : null,
+  };
+}
+
+// Resumen compacto para el panel: solo el puesto del usuario si hay muestra.
+export async function getRankingResumen(
+  categoriaId: string,
+  usuarioId: string,
+): Promise<{ puesto: number; total: number; nota: number } | null> {
+  const r = await getRankingSemanal(categoriaId, usuarioId);
+  if (r.total < RANKING_MIN_PARTICIPANTES || !r.tu) return null;
+  return { puesto: r.tu.puesto, total: r.total, nota: r.tu.nota };
+}
+
 export interface BuscadorItem {
   temaId: string;
   nombre: string;
@@ -376,6 +445,10 @@ export async function getDashboard(usuarioId: string) {
       })
     : null;
 
+  const rankingResumen = user?.categoriaPreferidaId
+    ? await getRankingResumen(user.categoriaPreferidaId, usuarioId)
+    : null;
+
   // Preguntas respondidas hoy (sesiones finalizadas hoy)
   const [hoy] = await db
     .select({ total: sql<number>`coalesce(sum(${sesiones.totalPreguntas}), 0)` })
@@ -423,6 +496,7 @@ export async function getDashboard(usuarioId: string) {
     plan,
     mejorNota,
     recibirResumen: user?.recibirResumen ?? true,
+    rankingResumen,
   };
 }
 
