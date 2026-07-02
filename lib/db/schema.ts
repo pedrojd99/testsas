@@ -55,6 +55,8 @@ export const usuarios = pgTable(
     // Plan de estudio: fecha objetivo del examen y meta diaria de preguntas
     fechaExamen: timestamp("fecha_examen", { withTimezone: true }),
     objetivoDiario: integer("objetivo_diario").notNull().default(20),
+    // Recibir el resumen semanal por email
+    recibirResumen: boolean("recibir_resumen").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => ({

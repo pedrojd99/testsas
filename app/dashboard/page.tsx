@@ -1,8 +1,9 @@
+import { Logros } from "@/components/logros";
 import { NotaTrend } from "@/components/nota-trend";
 import { PlanEstudio } from "@/components/plan-estudio";
 import { salir } from "@/lib/actions/auth";
 import { iniciarSesion } from "@/lib/actions/test";
-import { setOposicionPreferida } from "@/lib/actions/user";
+import { setOposicionPreferida, setResumenEmail } from "@/lib/actions/user";
 import { getSession } from "@/lib/auth";
 import { getCategorias, getDashboard } from "@/lib/queries";
 import {
@@ -33,6 +34,8 @@ export default async function DashboardPage() {
     preferida,
     enCurso,
     plan,
+    mejorNota,
+    recibirResumen,
   } = await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
@@ -187,6 +190,17 @@ export default async function DashboardPage() {
         </form>
       )}
 
+      {/* Logros */}
+      <Logros
+        datos={{
+          sesiones: Number(totales.sesiones),
+          respondidas: totalRespondidas + Number(totales.enBlanco),
+          precision: precisionGlobal,
+          racha,
+          mejorNota,
+        }}
+      />
+
       {/* Evolucion de la nota */}
       <section className="mt-10 rounded-lg border bg-card p-5 shadow-soft">
         <h2 className="mb-4 font-display text-xl font-semibold">Evolucion de tu nota</h2>
@@ -281,6 +295,20 @@ export default async function DashboardPage() {
           )}
         </section>
       </div>
+
+      {/* Ajustes de email */}
+      <form
+        action={setResumenEmail}
+        className="mt-10 flex flex-wrap items-center gap-3 border-t pt-6 text-sm text-muted-foreground"
+      >
+        <label className="flex items-center gap-2">
+          <input type="checkbox" name="recibirResumen" value="1" defaultChecked={recibirResumen} />
+          Recibir el resumen semanal por email
+        </label>
+        <button type="submit" className="rounded-md border px-3 py-1.5 hover:bg-accent">
+          Guardar
+        </button>
+      </form>
     </div>
   );
 }

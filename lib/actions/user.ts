@@ -23,6 +23,14 @@ export async function setOposicionPreferida(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+export async function setResumenEmail(formData: FormData) {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  const recibir = formData.get("recibirResumen") === "1";
+  await db.update(usuarios).set({ recibirResumen: recibir }).where(eq(usuarios.id, session.uid));
+  revalidatePath("/dashboard");
+}
+
 export async function setPlanEstudio(formData: FormData) {
   const session = await getSession();
   if (!session) redirect("/login");

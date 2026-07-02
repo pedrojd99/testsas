@@ -265,6 +265,12 @@ export async function getDashboard(usuarioId: string) {
 
   const racha = await getRacha(usuarioId);
 
+  const [mejor] = await db
+    .select({ nota: sql<number>`coalesce(max(${sesiones.nota}), 0)` })
+    .from(sesiones)
+    .where(and(eq(sesiones.usuarioId, usuarioId), isNotNull(sesiones.finishedAt)));
+  const mejorNota = Number(mejor?.nota ?? 0);
+
   // Sesion sin terminar (para reanudar)
   const sesionEnCurso = await db.query.sesiones.findFirst({
     where: and(eq(sesiones.usuarioId, usuarioId), isNull(sesiones.finishedAt)),
@@ -297,7 +303,12 @@ export async function getDashboard(usuarioId: string) {
   // Oposicion preferida + plan de estudio
   const user = await db.query.usuarios.findFirst({
     where: eq(usuarios.id, usuarioId),
-    columns: { categoriaPreferidaId: true, fechaExamen: true, objetivoDiario: true },
+    columns: {
+      categoriaPreferidaId: true,
+      fechaExamen: true,
+      objetivoDiario: true,
+      recibirResumen: true,
+    },
   });
   const preferida = user?.categoriaPreferidaId
     ? await db.query.categorias.findFirst({
@@ -351,6 +362,8 @@ export async function getDashboard(usuarioId: string) {
     preferida,
     enCurso,
     plan,
+    mejorNota,
+    recibirResumen: user?.recibirResumen ?? true,
   };
 }
 
