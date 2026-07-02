@@ -4,7 +4,15 @@ import { iniciarSesion } from "@/lib/actions/test";
 import { setOposicionPreferida } from "@/lib/actions/user";
 import { getSession } from "@/lib/auth";
 import { getCategorias, getDashboard } from "@/lib/queries";
-import { Clock, Flame, GraduationCap, RotateCcw, TrendingDown, Zap } from "lucide-react";
+import {
+  Clock,
+  Flame,
+  GraduationCap,
+  PlayCircle,
+  RotateCcw,
+  TrendingDown,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -14,7 +22,7 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const { recientes, totales, porTema, repasoPendiente, racha, tendencia, preferida } =
+  const { recientes, totales, porTema, repasoPendiente, racha, tendencia, preferida, enCurso } =
     await getDashboard(session.uid);
   const totalRespondidas = Number(totales.aciertos) + Number(totales.fallos);
   const precisionGlobal =
@@ -37,6 +45,25 @@ export default async function DashboardPage() {
           </button>
         </form>
       </div>
+
+      {/* Test sin terminar */}
+      {enCurso && (
+        <Link
+          href={`/test/${enCurso.id}`}
+          className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 transition-colors hover:bg-amber-500/10"
+        >
+          <div className="flex items-center gap-3">
+            <PlayCircle className="h-5 w-5 text-amber-600" />
+            <p className="text-sm">
+              Tienes un test sin terminar de <strong>{enCurso.categoria}</strong> ({enCurso.total}{" "}
+              preguntas).
+            </p>
+          </div>
+          <span className="rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white">
+            Continuar
+          </span>
+        </Link>
+      )}
 
       {/* Mi oposicion (inicio rapido) */}
       {preferida ? (

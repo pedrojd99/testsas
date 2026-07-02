@@ -11,7 +11,7 @@ import {
   temas,
   usuarios,
 } from "@/lib/db";
-import { and, count, desc, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, isNull, lte, sql } from "drizzle-orm";
 
 // Slug de la categoria estructural que agrupa el temario comun una sola vez.
 export const COMUN_SLUG = "comun";
@@ -251,6 +251,20 @@ export async function getDashboard(usuarioId: string) {
 
   const racha = await getRacha(usuarioId);
 
+  // Sesion sin terminar (para reanudar)
+  const sesionEnCurso = await db.query.sesiones.findFirst({
+    where: and(eq(sesiones.usuarioId, usuarioId), isNull(sesiones.finishedAt)),
+    with: { categoria: { columns: { nombre: true } } },
+    orderBy: (s, { desc }) => desc(s.startedAt),
+  });
+  const enCurso = sesionEnCurso
+    ? {
+        id: sesionEnCurso.id,
+        categoria: sesionEnCurso.categoria.nombre,
+        total: sesionEnCurso.totalPreguntas,
+      }
+    : null;
+
   // Tendencia: nota de las ultimas sesiones, en orden cronologico
   const tendenciaRows = await db
     .select({ nota: sesiones.nota, finishedAt: sesiones.finishedAt })
@@ -289,6 +303,7 @@ export async function getDashboard(usuarioId: string) {
     racha,
     tendencia,
     preferida,
+    enCurso,
   };
 }
 

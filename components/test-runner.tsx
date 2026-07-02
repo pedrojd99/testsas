@@ -50,7 +50,9 @@ export function TestRunner({
   const [respuestas, setRespuestas] = useState<Record<string, number | null>>({});
   const [marcadas, setMarcadas] = useState<Set<string>>(new Set());
   const [enviando, setEnviando] = useState(false);
+  const [listo, setListo] = useState(false);
   const enviadoRef = useRef(false);
+  const lsKey = `testsas:sesion:${sesionId}`;
 
   const pregunta = preguntas[actual];
   const respondidas = Object.values(respuestas).filter((v) => v !== null && v !== undefined).length;
@@ -59,12 +61,34 @@ export function TestRunner({
     if (enviadoRef.current) return;
     enviadoRef.current = true;
     setEnviando(true);
+    try {
+      localStorage.removeItem(lsKey);
+    } catch {}
     const payload: RespuestaEnviada[] = preguntas.map((p) => ({
       preguntaId: p.preguntaId,
       opcion: respuestas[p.preguntaId] ?? null,
     }));
     await finalizarSesion(sesionId, payload);
-  }, [preguntas, respuestas, sesionId]);
+  }, [preguntas, respuestas, sesionId, lsKey]);
+
+  // Reanudar: carga respuestas guardadas y luego persiste los cambios
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(lsKey);
+      if (raw) {
+        const guardado = JSON.parse(raw);
+        if (guardado && typeof guardado === "object") setRespuestas(guardado);
+      }
+    } catch {}
+    setListo(true);
+  }, [lsKey]);
+
+  useEffect(() => {
+    if (!listo) return;
+    try {
+      localStorage.setItem(lsKey, JSON.stringify(respuestas));
+    } catch {}
+  }, [respuestas, listo, lsKey]);
 
   // Cronometro del simulacro: el fin se calcula desde startedAt, asi que
   // sobrevive a recargas. Al llegar a 0 se autocorrige.
@@ -107,6 +131,27 @@ export function TestRunner({
       return next;
     });
   }
+
+  // Atajos de teclado: 1-4 responder, flechas navegar, F marcar
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) return;
+      if (e.key >= "1" && e.key <= "4") {
+        const idx = Number(e.key) - 1;
+        if (idx < pregunta.opciones.length) elegir(idx);
+      } else if (e.key === "ArrowRight") {
+        setActual((a) => Math.min(preguntas.length - 1, a + 1));
+      } else if (e.key === "ArrowLeft") {
+        setActual((a) => Math.max(0, a - 1));
+      } else if (e.key.toLowerCase() === "f") {
+        alternarMarca();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: elegir/alternarMarca dependen de la pregunta actual
+  }, [actual, revelada, preguntas.length, pregunta.opciones.length]);
 
   const navegacion = useMemo(
     () =>

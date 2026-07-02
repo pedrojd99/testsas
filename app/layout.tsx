@@ -1,4 +1,5 @@
 import { PwaRegister } from "@/components/pwa-register";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getSession } from "@/lib/auth";
 import type { Metadata, Viewport } from "next";
 import { Inter, Newsreader } from "next/font/google";
@@ -27,7 +28,17 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   return (
-    <html lang="es" className={`${inter.variable} ${newsreader.variable}`}>
+    <html lang="es" className={`${inter.variable} ${newsreader.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          // Aplica el tema antes de pintar para evitar parpadeo
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: script de tema pre-hidratacion
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}",
+          }}
+        />
+      </head>
       <body>
         <div className="h-1 w-full bg-primary" />
         <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
@@ -46,6 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/convocatoria" className="text-muted-foreground hover:text-foreground">
                 Convocatoria
               </Link>
+              <ThemeToggle />
               {session ? (
                 <>
                   {session.rol === "admin" && (
