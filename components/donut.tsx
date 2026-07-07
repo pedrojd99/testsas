@@ -19,7 +19,12 @@ export function Donut({
 
   return (
     <div className="relative h-40 w-40">
-      <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
+      <svg
+        viewBox="0 0 128 128"
+        className="h-full w-full -rotate-90"
+        role="img"
+        aria-label={`${pct}% de aciertos: ${aciertos} aciertos, ${fallos} fallos, ${enBlanco} en blanco`}
+      >
         <circle cx="64" cy="64" r={R} fill="none" stroke="hsl(var(--muted))" strokeWidth="14" />
         {/* aciertos */}
         <circle

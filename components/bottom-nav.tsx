@@ -65,10 +65,14 @@ function Item({
   return (
     <Link
       href={href}
-      className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 ${
-        activo ? "text-primary" : "text-muted-foreground"
+      aria-current={activo ? "page" : undefined}
+      className={`relative flex min-h-[56px] touch-manipulation flex-col items-center justify-center gap-0.5 ${
+        activo ? "font-semibold text-primary" : "text-muted-foreground"
       }`}
     >
+      {activo && (
+        <span className="absolute inset-x-5 top-0 h-0.5 rounded-full bg-primary" aria-hidden />
+      )}
       {icon}
       <span className="text-[0.65rem] font-medium">{label}</span>
     </Link>

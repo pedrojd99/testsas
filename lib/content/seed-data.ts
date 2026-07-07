@@ -3,17 +3,9 @@
 // se anaden algunas preguntas de muestra. El banco real se genera desde temario.
 
 import { ESPECIFICOS_POR_CATEGORIA, TEMAS_COMUNES, type TemaOficial } from "./temas-oficiales";
+import type { SeedPregunta } from "./tipos";
 
-export interface SeedPregunta {
-  enunciado: string;
-  opciones: [string, string, string, string];
-  correctaIndex: 0 | 1 | 2 | 3;
-  explicacion: string;
-  fuente: string;
-  dificultad: "facil" | "media" | "dificil";
-  temaSlug: string;
-  oficial?: boolean;
-}
+export type { SeedPregunta };
 
 export interface SeedCategoria {
   slug: string;

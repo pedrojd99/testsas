@@ -216,6 +216,9 @@ export function TestRunner({
             <div className="flex items-center gap-2">
               {restante !== null && (
                 <span
+                  role="timer"
+                  aria-live={restanteUrgente ? "assertive" : "off"}
+                  aria-label={`Tiempo restante ${mmss(restante)}`}
                   className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm font-medium tabular-nums ${
                     restanteUrgente
                       ? "border-destructive/40 bg-destructive/5 text-destructive"
@@ -257,7 +260,9 @@ export function TestRunner({
                     irA(n.i);
                     setIndiceAbierto(false);
                   }}
-                  className={`relative flex h-10 items-center justify-center rounded-md text-sm font-medium transition-colors ${
+                  aria-label={`Ir a la pregunta ${n.i + 1}${n.respondida ? ", respondida" : ""}${n.marcada ? ", marcada" : ""}`}
+                  aria-current={n.i === actual ? "true" : undefined}
+                  className={`relative flex h-11 items-center justify-center rounded-md text-sm font-medium transition-colors ${
                     n.i === actual
                       ? "bg-primary text-primary-foreground"
                       : n.respondida
@@ -290,7 +295,8 @@ export function TestRunner({
             <button
               type="button"
               onClick={alternarMarca}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${
+              aria-pressed={marcadas.has(pregunta.preguntaId)}
+              className={`-mr-2 flex min-h-[44px] touch-manipulation items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${
                 marcadas.has(pregunta.preguntaId)
                   ? "text-amber-600"
                   : "text-muted-foreground hover:text-foreground"
@@ -323,7 +329,8 @@ export function TestRunner({
                   type="button"
                   onClick={() => elegir(idx)}
                   disabled={revelada}
-                  className={`flex min-h-[56px] w-full items-center gap-3 rounded-xl border p-3.5 text-left text-sm transition-all ${cls}`}
+                  aria-pressed={esElegida}
+                  className={`flex min-h-[56px] w-full touch-manipulation items-center gap-3 rounded-xl border p-3.5 text-left text-sm transition-all ${cls}`}
                 >
                   <span
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${

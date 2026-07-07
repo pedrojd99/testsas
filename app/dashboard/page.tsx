@@ -56,7 +56,10 @@ export default async function DashboardPage() {
           </h1>
         </div>
         <form action={salir}>
-          <button type="submit" className="text-sm text-muted-foreground hover:text-foreground">
+          <button
+            type="submit"
+            className="-mr-2 inline-flex min-h-[44px] items-center px-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             Salir
           </button>
         </form>
@@ -129,6 +132,7 @@ export default async function DashboardPage() {
           <p className="text-sm">Elige tu oposicion para tener acceso rapido:</p>
           <select
             name="categoriaSlug"
+            aria-label="Elige tu oposicion"
             className="rounded-md border bg-background px-2 py-1.5 text-sm"
             defaultValue=""
           >

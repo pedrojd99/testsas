@@ -50,6 +50,7 @@ export default async function RankingPage({
             <Link
               key={c.id}
               href={`/ranking?cat=${c.slug}`}
+              aria-current={activa ? "page" : undefined}
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 activa
                   ? "border-primary bg-primary/10 text-primary"
@@ -104,6 +105,7 @@ export default async function RankingPage({
               }`}
             >
               <span
+                aria-label={`Puesto ${e.puesto}`}
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                   e.puesto === 1
                     ? "bg-amber-400/20 text-amber-600"
@@ -114,7 +116,7 @@ export default async function RankingPage({
                         : "bg-muted text-muted-foreground"
                 }`}
               >
-                {e.puesto <= 3 ? <Medal className="h-4 w-4" /> : e.puesto}
+                {e.puesto <= 3 ? <Medal className="h-4 w-4" aria-hidden /> : e.puesto}
               </span>
               <span className="flex-1 text-sm font-medium">
                 {e.esTuyo ? "Tú" : `Opositor #${e.puesto}`}
