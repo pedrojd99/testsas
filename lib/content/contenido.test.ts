@@ -7,7 +7,7 @@ import { ESPECIFICOS_POR_CATEGORIA, TEMAS_COMUNES, type TemaOficial } from "./te
 // cobertura total de sus temas. El bloque "comun" agrupa los 10 temas
 // compartidos. El resto se reporta como pendiente sin romper la suite, para
 // poder consolidar el contenido por tandas. Se van anadiendo al cerrar cada tanda.
-const BLOQUES_COMPLETOS = new Set<string>([]);
+const BLOQUES_COMPLETOS = new Set<string>(["comun", "celador", "tcae", "aux-administrativo"]);
 
 const MIN_PREGUNTAS_POR_TEMA = 8;
 const MIN_PALABRAS_APUNTE = 250;
