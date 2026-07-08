@@ -69,12 +69,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "La Constitución Española de 1978 consta de un Título Preliminar, diez títulos y un total de:",
-    opciones: [
-      "149 artículos",
-      "169 artículos",
-      "155 artículos",
-      "139 artículos",
-    ],
+    opciones: ["149 artículos", "169 artículos", "155 artículos", "139 artículos"],
     correctaIndex: 1,
     explicacion:
       "La Constitución se compone de un Título Preliminar y diez títulos, con 169 artículos, además de disposiciones adicionales, transitorias, derogatoria y final.",
@@ -101,12 +96,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El derecho a la vida y a la integridad física y moral, con la abolición de la pena de muerte salvo lo que dispongan las leyes penales militares en tiempos de guerra, se reconoce en el:",
-    opciones: [
-      "Artículo 10 CE",
-      "Artículo 12 CE",
-      "Artículo 14 CE",
-      "Artículo 15 CE",
-    ],
+    opciones: ["Artículo 10 CE", "Artículo 12 CE", "Artículo 14 CE", "Artículo 15 CE"],
     correctaIndex: 3,
     explicacion:
       "El art. 15 CE reconoce el derecho a la vida y a la integridad física y moral y abole la pena de muerte, con la salvedad de las leyes penales militares en tiempos de guerra.",
@@ -117,12 +107,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El derecho a la protección de la salud y la competencia de los poderes públicos para organizar y tutelar la salud pública se recogen en el:",
-    opciones: [
-      "Artículo 43 CE",
-      "Artículo 27 CE",
-      "Artículo 35 CE",
-      "Artículo 41 CE",
-    ],
+    opciones: ["Artículo 43 CE", "Artículo 27 CE", "Artículo 35 CE", "Artículo 41 CE"],
     correctaIndex: 0,
     explicacion:
       "El art. 43 CE reconoce el derecho a la protección de la salud y encomienda a los poderes públicos organizar y tutelar la salud pública mediante medidas preventivas y prestaciones.",
@@ -163,8 +148,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "constitucion",
   },
   {
-    enunciado:
-      "Las Cortes Generales, que representan al pueblo español, están formadas por:",
+    enunciado: "Las Cortes Generales, que representan al pueblo español, están formadas por:",
     opciones: [
       "El Congreso de los Diputados y el Senado",
       "El Congreso de los Diputados y el Gobierno",
@@ -181,12 +165,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "Según el artículo 97 de la Constitución, ¿a quién corresponde dirigir la política interior y exterior, la Administración civil y militar y la defensa del Estado?",
-    opciones: [
-      "A las Cortes Generales",
-      "Al Gobierno",
-      "Al Rey",
-      "Al Tribunal Constitucional",
-    ],
+    opciones: ["A las Cortes Generales", "Al Gobierno", "Al Rey", "Al Tribunal Constitucional"],
     correctaIndex: 1,
     explicacion:
       "El art. 97 CE atribuye al Gobierno la dirección de la política interior y exterior, la Administración civil y militar y la defensa del Estado, y el ejercicio de la función ejecutiva y la potestad reglamentaria.",
@@ -197,8 +176,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
 
   // Tema 2: estatuto-andalucia
   {
-    enunciado:
-      "El vigente Estatuto de Autonomía para Andalucía fue aprobado mediante:",
+    enunciado: "El vigente Estatuto de Autonomía para Andalucía fue aprobado mediante:",
     opciones: [
       "La Ley Orgánica 6/1981",
       "La Ley 2/1998",
@@ -261,8 +239,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "estatuto-andalucia",
   },
   {
-    enunciado:
-      "La potestad legislativa de la Comunidad Autónoma de Andalucía corresponde a:",
+    enunciado: "La potestad legislativa de la Comunidad Autónoma de Andalucía corresponde a:",
     opciones: [
       "El Consejo de Gobierno",
       "La Presidencia de la Junta",
@@ -327,12 +304,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El territorio de la Comunidad Autónoma de Andalucía comprende los municipios integrados en sus actuales provincias, esto es:",
-    opciones: [
-      "Siete provincias",
-      "Ocho provincias",
-      "Nueve provincias",
-      "Diez provincias",
-    ],
+    opciones: ["Siete provincias", "Ocho provincias", "Nueve provincias", "Diez provincias"],
     correctaIndex: 1,
     explicacion:
       "El art. 2 EA delimita el territorio andaluz en ocho provincias: Almería, Cádiz, Córdoba, Granada, Huelva, Jaén, Málaga y Sevilla.",
@@ -368,8 +340,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "estatuto-andalucia",
   },
   {
-    enunciado:
-      "El artículo 1 del Estatuto de Autonomía de 2007 define a Andalucía como:",
+    enunciado: "El artículo 1 del Estatuto de Autonomía de 2007 define a Andalucía como:",
     opciones: [
       "Una región de España",
       "Un territorio foral",
@@ -386,8 +357,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
 
   // Tema 3: organizacion-sanitaria-1
   {
-    enunciado:
-      "La Ley 14/1986, de 25 de abril, General de Sanidad tiene como objeto principal:",
+    enunciado: "La Ley 14/1986, de 25 de abril, General de Sanidad tiene como objeto principal:",
     opciones: [
       "La regulación general de todas las acciones que permitan hacer efectivo el derecho a la protección de la salud reconocido en la Constitución",
       "La regulación exclusiva de la Seguridad Social",
@@ -402,8 +372,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-1",
   },
   {
-    enunciado:
-      "Según la Ley General de Sanidad, el Sistema Nacional de Salud se define como:",
+    enunciado: "Según la Ley General de Sanidad, el Sistema Nacional de Salud se define como:",
     opciones: [
       "El conjunto de hospitales privados concertados",
       "El conjunto de los servicios de salud de la Administración del Estado y de los servicios de salud de las Comunidades Autónomas",
@@ -466,8 +435,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-1",
   },
   {
-    enunciado:
-      "La Ley 2/1998, de 15 de junio, de Salud de Andalucía tiene por objeto principal:",
+    enunciado: "La Ley 2/1998, de 15 de junio, de Salud de Andalucía tiene por objeto principal:",
     opciones: [
       "Regular únicamente el régimen del personal estatutario",
       "Crear el Colegio de Médicos de Andalucía",
@@ -530,8 +498,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-1",
   },
   {
-    enunciado:
-      "El Plan Andaluz de Salud, conforme a la Ley 2/1998, es aprobado por:",
+    enunciado: "El Plan Andaluz de Salud, conforme a la Ley 2/1998, es aprobado por:",
     opciones: [
       "El Parlamento de Andalucía",
       "La persona titular de la Consejería de Salud",
@@ -562,8 +529,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-1",
   },
   {
-    enunciado:
-      "Según la Ley 2/1998, el Sistema Sanitario Público de Andalucía se define como:",
+    enunciado: "Según la Ley 2/1998, el Sistema Sanitario Público de Andalucía se define como:",
     opciones: [
       "El conjunto de las oficinas de farmacia de la Comunidad",
       "El conjunto de recursos, medios organizativos y actuaciones de las Administraciones sanitarias públicas de Andalucía",
@@ -611,8 +577,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-2",
   },
   {
-    enunciado:
-      "El máximo órgano de dirección y gestión del Servicio Andaluz de Salud es:",
+    enunciado: "El máximo órgano de dirección y gestión del Servicio Andaluz de Salud es:",
     opciones: [
       "El Consejo de Administración",
       "La Dirección Gerencia del SAS",
@@ -723,8 +688,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "organizacion-sanitaria-2",
   },
   {
-    enunciado:
-      "Entre las funciones que corresponden al Servicio Andaluz de Salud se encuentra:",
+    enunciado: "Entre las funciones que corresponden al Servicio Andaluz de Salud se encuentra:",
     opciones: [
       "La gestión y administración de los centros y servicios sanitarios de atención primaria y especializada de su dependencia",
       "La aprobación de las leyes sanitarias andaluzas",
@@ -981,8 +945,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "prl",
   },
   {
-    enunciado:
-      "Según el artículo 4 de la Ley 31/1995, se entiende por riesgo laboral:",
+    enunciado: "Según el artículo 4 de la Ley 31/1995, se entiende por riesgo laboral:",
     opciones: [
       "Todo accidente que provoque una baja médica",
       "Cualquier enfermedad reconocida por la Seguridad Social",
@@ -999,12 +962,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El conjunto de actividades o medidas adoptadas o previstas en todas las fases de actividad de la empresa con el fin de evitar o disminuir los riesgos derivados del trabajo se define, en la Ley 31/1995, como:",
-    opciones: [
-      "Condición de trabajo",
-      "Prevención",
-      "Vigilancia de la salud",
-      "Emergencia",
-    ],
+    opciones: ["Condición de trabajo", "Prevención", "Vigilancia de la salud", "Emergencia"],
     correctaIndex: 1,
     explicacion:
       "El art. 4.1 LPRL define la prevención como el conjunto de actividades o medidas adoptadas o previstas en todas las fases de la actividad de la empresa para evitar o disminuir los riesgos del trabajo.",
@@ -1013,8 +971,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "prl",
   },
   {
-    enunciado:
-      "El artículo 14 de la Ley 31/1995 reconoce a los trabajadores el derecho a:",
+    enunciado: "El artículo 14 de la Ley 31/1995 reconoce a los trabajadores el derecho a:",
     opciones: [
       "Una protección eficaz en materia de seguridad y salud en el trabajo",
       "Elegir libremente su puesto de trabajo",
@@ -1093,8 +1050,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "prl",
   },
   {
-    enunciado:
-      "Los delegados de prevención, según el artículo 35 de la Ley 31/1995, son:",
+    enunciado: "Los delegados de prevención, según el artículo 35 de la Ley 31/1995, son:",
     opciones: [
       "Técnicos externos contratados por la empresa",
       "Los representantes de los trabajadores con funciones específicas en materia de prevención de riesgos",
@@ -1109,8 +1065,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "prl",
   },
   {
-    enunciado:
-      "El Comité de Seguridad y Salud regulado en el artículo 38 de la Ley 31/1995 es:",
+    enunciado: "El Comité de Seguridad y Salud regulado en el artículo 38 de la Ley 31/1995 es:",
     opciones: [
       "El órgano paritario y colegiado de participación destinado a la consulta regular y periódica de las actuaciones de la empresa en prevención",
       "Un órgano exclusivo de la dirección de la empresa",
@@ -1175,8 +1130,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "igualdad-genero",
   },
   {
-    enunciado:
-      "Se produce discriminación indirecta por razón de sexo cuando:",
+    enunciado: "Se produce discriminación indirecta por razón de sexo cuando:",
     opciones: [
       "Una persona es tratada de forma abiertamente menos favorable por su sexo",
       "Se acosa sexualmente a una persona en el trabajo",
@@ -1288,12 +1242,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El comportamiento verbal, no verbal o físico de naturaleza sexual con el propósito o efecto de atentar contra la dignidad de una persona, creando un entorno intimidatorio u ofensivo, se denomina:",
-    opciones: [
-      "Discriminación directa",
-      "Acción positiva",
-      "Acoso sexual",
-      "Violencia vicaria",
-    ],
+    opciones: ["Discriminación directa", "Acción positiva", "Acoso sexual", "Violencia vicaria"],
     correctaIndex: 2,
     explicacion:
       "El acoso sexual es cualquier comportamiento verbal, no verbal o físico de naturaleza sexual que atente contra la dignidad de la persona, creando un entorno intimidatorio, degradante u ofensivo.",
@@ -1448,8 +1397,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "estatuto-marco",
   },
   {
-    enunciado:
-      "Según la Ley 55/2003, son retribuciones básicas del personal estatutario:",
+    enunciado: "Según la Ley 55/2003, son retribuciones básicas del personal estatutario:",
     opciones: [
       "El sueldo, los trienios y las pagas extraordinarias",
       "El complemento de destino y el específico",
@@ -1556,8 +1504,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "autonomia-paciente",
   },
   {
-    enunciado:
-      "Constituye un principio básico de la Ley 41/2002, recogido en su artículo 2, que:",
+    enunciado: "Constituye un principio básico de la Ley 41/2002, recogido en su artículo 2, que:",
     opciones: [
       "El paciente carece de derecho a rechazar el tratamiento",
       "Toda actuación en el ámbito de la sanidad requiere, con carácter general, el previo consentimiento de los pacientes o usuarios",
@@ -1765,12 +1712,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El sistema de prescripción y dispensación electrónica de medicamentos del Servicio Andaluz de Salud se denomina:",
-    opciones: [
-      "NUHSA",
-      "Receta XXI",
-      "InterSAS",
-      "Diraya Atención Especializada",
-    ],
+    opciones: ["NUHSA", "Receta XXI", "InterSAS", "Diraya Atención Especializada"],
     correctaIndex: 1,
     explicacion:
       "Receta XXI es el sistema de receta electrónica del SAS que permite la prescripción por el facultativo y la dispensación en la oficina de farmacia sin necesidad de receta en papel.",
@@ -1779,7 +1721,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
     temaSlug: "tic-sas",
   },
   {
-    enunciado: "El NUHSA es:",
+    enunciado: "En el sistema sanitario andaluz, el NUHSA es:",
     opciones: [
       "El Número Único de Historia de Salud de Andalucía que identifica de forma unívoca a cada ciudadano en el sistema sanitario",
       "Un código de barras de los medicamentos",
@@ -1890,12 +1832,7 @@ export const BANCO_COMUN: SeedPregunta[] = [
   {
     enunciado:
       "El fichero corporativo del SAS que centraliza los datos identificativos y administrativos de los usuarios del sistema sanitario, asignando el NUHSA, es:",
-    opciones: [
-      "Receta XXI",
-      "ClicSalud+",
-      "Salud Responde",
-      "La Base de Datos de Usuarios (BDU)",
-    ],
+    opciones: ["Receta XXI", "ClicSalud+", "Salud Responde", "La Base de Datos de Usuarios (BDU)"],
     correctaIndex: 3,
     explicacion:
       "La Base de Datos de Usuarios (BDU) es el fichero corporativo que gestiona la información identificativa y administrativa de los usuarios y asigna el NUHSA que los identifica de forma única.",
