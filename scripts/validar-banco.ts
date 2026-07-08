@@ -11,10 +11,12 @@ import type { SeedPregunta } from "../lib/content/tipos";
 // las marcadas como no validas son candidatas a revision, no errores seguros.
 //
 // Uso:
-//   pnpm validar-banco                 -> valida TODO el banco (1314 llamadas)
-//   pnpm validar-banco -- --limit 40   -> muestra de 40 (para probar)
-//   pnpm validar-banco -- --tema prl    -> solo un tema
-//   pnpm validar-banco -- --conc 8      -> concurrencia (por defecto 6)
+//   pnpm validar-banco                  -> valida TODO el banco (1314 llamadas)
+//   pnpm validar-banco -- --por-tema 1   -> 1 pregunta por tema (121, muestra representativa)
+//   pnpm validar-banco -- --por-tema 2   -> 2 por tema (242)
+//   pnpm validar-banco -- --limit 40     -> primeras 40 (muestra rapida)
+//   pnpm validar-banco -- --tema prl     -> solo un tema
+//   pnpm validar-banco -- --conc 8       -> concurrencia (por defecto 6)
 
 const args = process.argv.slice(2);
 function arg(nombre: string): string | undefined {
@@ -23,8 +25,23 @@ function arg(nombre: string): string | undefined {
 }
 
 const LIMITE = arg("limit") ? Number(arg("limit")) : undefined;
+const POR_TEMA = arg("por-tema") ? Number(arg("por-tema")) : undefined;
 const TEMA = arg("tema");
 const CONC = arg("conc") ? Number(arg("conc")) : 6;
+
+// Toma hasta k preguntas de cada tema, preservando el orden del banco.
+function muestrearPorTema(preguntas: SeedPregunta[], k: number): SeedPregunta[] {
+  const cuenta = new Map<string, number>();
+  const out: SeedPregunta[] = [];
+  for (const p of preguntas) {
+    const n = cuenta.get(p.temaSlug) ?? 0;
+    if (n < k) {
+      out.push(p);
+      cuenta.set(p.temaSlug, n + 1);
+    }
+  }
+  return out;
+}
 
 // Referencia por tema: contenido del apunte + puntos clave.
 const refPorTema = new Map<string, string>();
@@ -64,6 +81,7 @@ async function main() {
 
   let preguntas: SeedPregunta[] = SEED_BANCO;
   if (TEMA) preguntas = preguntas.filter((p) => p.temaSlug === TEMA);
+  if (POR_TEMA) preguntas = muestrearPorTema(preguntas, POR_TEMA);
   if (LIMITE) preguntas = preguntas.slice(0, LIMITE);
 
   const sinRef = preguntas.filter((p) => !refPorTema.has(p.temaSlug)).length;
