@@ -16,6 +16,7 @@
     "db:seed-temario": "tsx --env-file=.env.local scripts/seed-temario.ts",
     "db:seed-apuntes": "tsx --env-file=.env.local scripts/seed-apuntes.ts",
     "db:seed-banco": "tsx --env-file=.env.local scripts/seed-banco.ts",
+    "validar-banco": "tsx --env-file=.env.local scripts/validar-banco.ts",
     "db:seed-examenes": "tsx --env-file=.env.local scripts/seed-examenes.ts",
     "ingest": "tsx --env-file=.env.local scripts/ingestar.ts",
     "gen": "tsx --env-file=.env.local scripts/generar.ts",
