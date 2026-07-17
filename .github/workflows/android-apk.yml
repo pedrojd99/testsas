@@ -1,0 +1,58 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'capacitor-shell/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Instalacion minima: el lockfile de pnpm incluye @img/sharp-win32-x64
+      # (solo Windows) y romperia un install completo en Linux. Gradle solo
+      # necesita @capacitor/android en node_modules y `cap sync` regenera
+      # capacitor.settings.gradle con la ruta correcta.
+      - name: Install Capacitor tooling
+        run: |
+          mkdir -p /tmp/captools
+          cd /tmp/captools
+          npm init -y > /dev/null
+          npm install @capacitor/cli@6.2.1 @capacitor/core@6.2.1 @capacitor/android@6.2.1 typescript@5
+          mv node_modules "$GITHUB_WORKSPACE/node_modules"
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+        env:
+          CAP_SERVER_URL: https://testsas-pedroj82.vercel.app
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build debug APK
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk testsas.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: testsas-apk
+          path: testsas.apk
+          retention-days: 30
